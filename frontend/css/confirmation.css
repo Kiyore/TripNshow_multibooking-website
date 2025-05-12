@@ -1,0 +1,97 @@
+/* Confirmation Styles */
+
+.card-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.confirmation-details {
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.confirmation-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #ffcc66;
+}
+
+.confirmation-header h3 {
+    color: #4CAF50;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.confirmation-info h4 {
+    color: #333;
+    font-size: 1.3rem;
+    margin: 25px 0 15px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.confirmation-info p {
+    margin: 10px 0;
+    font-size: 1rem;
+    color: #555;
+}
+
+.confirmation-info p strong {
+    color: #333;
+    min-width: 150px;
+    display: inline-block;
+}
+
+.traveler-item {
+    margin-bottom: 8px;
+    padding-left: 20px;
+}
+
+.confirmation-actions {
+    margin-top: 40px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #45a049, #3d8b40);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #ffcc66, #ff9966);
+    color: #333;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+    text-decoration: none;
+    text-align: center;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #ff9966, #ff5733);
+    transform: translateY(-2px);
+}
