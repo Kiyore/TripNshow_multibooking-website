@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TripNShow - Packages</title>
+  <link rel="stylesheet" href="css/packages.css">
+ 
+ 
+  
+  <link rel="stylesheet" href="css/package_deals.css">
+</head>
+<body>
+  <header>
+    <h1><a href="index.html">TripNShow</a></h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="packages.html">Packages</a></li>
+        <li><a href="upcoming-packages.html">Upcoming Package</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content">
+      <h2>Book Your Package Today!</h2>
+      <p>Explore curated travel packages at great prices!</p>
+    </div>
+  </section>
+
+  <section class="container">
+    <h2>Search Packages</h2>
+    <div class="search-container package-search">
+      <form id="package-search-form" onsubmit="searchPackages(event)">
+        <div class="form-group">
+          <label for="destination">Destination:</label>
+          <input type="text" id="destination" name="destination" placeholder="e.g., Goa" required>
+        </div>
+        <div class="form-group">
+          <label for="start-date">Start Date:</label>
+          <input type="date" id="start-date" name="startDate" required>
+        </div>
+        <div class="form-group">
+          <label for="travelers">Travelers:</label>
+          <input type="number" id="travelers" name="travelers" min="1" value="1" required>
+        </div>
+        <button type="submit">Search Packages</button>
+      </form>
+    </div>
+
+    <h3>Available Packages</h3>
+    <div id="package-list" class="package-grid"></div>
+  </section>
+
+  <script src="js/auth.js"></script>
+  <script>
+    let allPackages = [];
+
+    async function fetchPackages() {
+      const packageList = document.getElementById('package-list');
+      packageList.innerHTML = '<p>Loading packages...</p>';
+
+      try {
+        const response = await fetch('http://localhost:5000/api/packages');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const raw = await response.text();
+        console.log('API Response:', raw);
+        allPackages = raw ? JSON.parse(raw) : [];
+        console.log('All Packages:', allPackages);
+
+        if (!allPackages || allPackages.length === 0) {
+          packageList.innerHTML = '<p>No packages available.</p>';
+          return;
+        }
+
+        displayPackages(allPackages);
+      } catch (error) {
+        console.error('Error fetching packages:', error);
+        packageList.innerHTML = `<p>Error loading packages: ${error.message}. Please try again later.</p>`;
+      }
+    }
+
+    function displayPackages(packages) {
+      const packageList = document.getElementById('package-list');
+      packageList.innerHTML = '';
+      packages.forEach(pkg => {
+        const locationMap = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pkg.location || '')}`;
+        const imageSearch = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(pkg.location || '')}`;
+
+        packageList.innerHTML += `
+          <div class="package-card">
+            <img class="package-img" src="${pkg.image_path || '/images/packages/default.jpg'}" alt="${pkg.title || 'Package Image'}" />
+
+
+            <div class="package-details">
+              <h4>${pkg.title || 'N/A'} (${pkg.location || 'N/A'})</h4>
+              <div class="package-info">
+                <p><span class="icon">📍</span> Location: ${pkg.location || 'N/A'}</p>
+                <p><span class="icon">🗓️</span> Start Date: ${pkg.start_date || 'N/A'} | End Date: ${pkg.end_date || 'N/A'}</p>
+                <p><span class="icon">💺</span> Slots Available: ${pkg.slots_available || 'N/A'}</p>
+                <p><span class="icon">📝</span> Description: ${pkg.description || 'N/A'}</p>
+                <p><span class="icon">📌</span> Map: <a href="${locationMap}" target="_blank">View Location</a></p>
+                <p><span class="icon">🖼️</span> Photos: <a href="${imageSearch}" target="_blank">See Images</a></p>
+              </div>
+              <div class="package-price">
+                <span class="discounted-price">₹${pkg.price || 'N/A'}</span>
+                <span class="price-note">per person</span>
+              </div>
+              <button onclick="bookPackage(${pkg.id || 0})">Book Now</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function searchPackages(event) {
+      event.preventDefault();
+      const form = document.getElementById('package-search-form');
+      const formData = new FormData(form);
+      const destination = formData.get('destination').toLowerCase().trim();
+
+      if (!destination) {
+        alert("Please fill out the destination.");
+        return;
+      }
+
+      console.log('Searching for:', { destination });
+
+      const filteredPackages = allPackages.filter(pkg =>
+        pkg.location?.toLowerCase().includes(destination) || ''
+      );
+
+      if (filteredPackages.length === 0) {
+        document.getElementById('package-list').innerHTML = '<p>No packages found matching your search.</p>';
+      } else {
+        displayPackages(filteredPackages);
+      }
+    }
+
+    function bookPackage(packageId) {
+      console.log('bookPackage called with packageId:', packageId);
+      try {
+        if (typeof requireAuth !== 'function') {
+            console.error('requireAuth is not defined. Proceeding without authentication for testing.');
+            // Uncomment the next line to enforce authentication
+            // return;
+        } else if (!requireAuth()) {
+            alert("Please log in to book a hotel.");
+            return;
+        }
+
+        const form = document.getElementById('package-search-form');
+        if (!form) {
+          console.error('Form not found!');
+          alert("Error: Form not found. Please reload the page.");
+          return;
+        }
+
+        const formData = new FormData(form);
+        const startDate = formData.get('startDate');
+        const travelers = formData.get('travelers');
+
+        if (!startDate || !travelers) {
+          alert("Please fill in start date and number of travelers before booking!");
+          return;
+        }
+
+        const redirectUrl = `booking-details.html?type=package&id=${packageId}&startDate=${encodeURIComponent(startDate)}&travelers=${travelers}`;
+        console.log('Redirecting to:', redirectUrl);
+        window.location.href = redirectUrl;
+      } catch (error) {
+        console.error('Error in bookPackage:', error);
+        alert(`An error occurred: ${error.message}`);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => fetchPackages());
+  </script>
+</body>
+</html>

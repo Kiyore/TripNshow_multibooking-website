@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Buses</title>
+    <link rel="stylesheet" href="css/buses.css">
+   
+   
+    
+    <link rel="stylesheet" href="css/bus_deals.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="buses.html">Buses</a></li>
+                <li><a href="upcoming-buses.html">Bus Deals</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Book Your Bus Today!</h2>
+            <p>Travel comfortably with the best bus services!</p>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2>Search Buses</h2>
+        <div class="search-container bus-search">
+            <form id="bus-search-form" onsubmit="searchBuses(event)">
+                <div class="form-group">
+                    <label for="departure-city">Departure City:</label>
+                    <input type="text" id="departure-city" name="departureCity" placeholder="e.g., Mumbai" required>
+                </div>
+                <div class="form-group">
+                    <label for="destination-city">Destination City:</label>
+                    <input type="text" id="destination-city" name="destinationCity" placeholder="e.g., Pune" required>
+                </div>
+                <div class="form-group">
+                    <label for="travel-date">Travel Date:</label>
+                    <input type="date" id="travel-date" name="travelDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="seats">Seats:</label>
+                    <input type="number" id="seats" name="seats" min="1" value="1" required>
+                </div>
+                <button type="submit">Search Buses</button>
+            </form>
+        </div>
+
+        <h3>Available Buses</h3>
+        <div id="bus-list" class="bus-grid"></div>
+    </section>
+
+    <script src="js/auth.js"></script>
+    <script>
+        let allBuses = [];
+
+        async function fetchBuses() {
+            const busList = document.getElementById('bus-list');
+            busList.innerHTML = '<p>Loading buses...</p>';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/buses');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const raw = await response.text();
+                console.log('API Response:', raw);
+                allBuses = raw ? JSON.parse(raw) : [];
+                console.log('All Buses:', allBuses);
+
+                if (!allBuses || allBuses.length === 0) {
+                    busList.innerHTML = '<p>No buses available.</p>';
+                    return;
+                }
+
+                displayBuses(allBuses);
+            } catch (error) {
+                console.error('Error fetching buses:', error);
+                busList.innerHTML = `<p>Error loading buses: ${error.message}. Please try again later.</p>`;
+            }
+        }
+
+        function displayBuses(buses) {
+            const busList = document.getElementById('bus-list');
+            busList.innerHTML = '';
+            buses.forEach(bus => {
+                busList.innerHTML += `
+                    <div class="bus-card">
+                        <img class="bus-img" src="${bus.image_path || '/images/buses/default.jpg'}" alt="${bus.name || 'Bus Image'}" />
+
+
+                        <div class="bus-details">
+                            <h4>${bus.source || 'N/A'} to ${bus.destination || 'N/A'}</h4>
+                            <div class="bus-info">
+                                <p><span class="icon">🚌</span> Operator: ${bus.bus_name || 'N/A'}</p>
+                                <p><span class="icon">🛫</span> Departure: ${bus.departure_time || 'N/A'}</p>
+                                <p><span class="icon">🛬</span> Arrival: ${bus.arrival_time || 'N/A'}</p>
+                                <p><span class="icon">💺</span> Seats Available: ${bus.seats_available || 'N/A'}</p>
+                            </div>
+                            <div class="bus-price">
+                                <span class="discounted-price">₹${bus.price || 'N/A'}</span>
+                                <span class="price-note">per seat</span>
+                            </div>
+                            <button onclick="bookBus(${bus.id || 0})">Book Now</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function searchBuses(event) {
+            event.preventDefault();
+            const form = document.getElementById('bus-search-form');
+            const formData = new FormData(form);
+            const departureCity = formData.get('departureCity').toLowerCase().trim();
+            const destinationCity = formData.get('destinationCity').toLowerCase().trim();
+
+            if (!departureCity || !destinationCity) {
+                alert("Please fill out both departure and destination cities.");
+                return;
+            }
+            if (departureCity === destinationCity) {
+                alert("Source and destination cities must be different.");
+                return;
+            }
+
+            console.log('Searching for:', { departureCity, destinationCity });
+
+            const filteredBuses = allBuses.filter(bus =>
+                (bus.source?.toLowerCase().includes(departureCity) || '') &&
+                (bus.destination?.toLowerCase().includes(destinationCity) || '')
+            );
+
+            if (filteredBuses.length === 0) {
+                document.getElementById('bus-list').innerHTML = '<p>No buses found matching your search.</p>';
+            } else {
+                displayBuses(filteredBuses);
+            }
+        }
+
+        function bookBus(busId) {
+            console.log('bookBus called with busId:', busId); // Debug log
+            try {
+                if (typeof requireAuth !== 'function') {
+                    console.error('requireAuth is not defined. Proceeding without authentication for testing.');
+                    // Uncomment the next line to enforce authentication
+                    // return;
+                } else if (!requireAuth()) {
+                    alert("Please log in to book a bus.");
+                    return;
+                }
+
+                const form = document.getElementById('bus-search-form');
+                if (!form) {
+                    console.error('Form not found!');
+                    alert("Error: Form not found. Please reload the page.");
+                    return;
+                }
+
+                const formData = new FormData(form);
+                const travelDate = formData.get('travelDate');
+                const seats = formData.get('seats');
+
+                if (!travelDate || !seats) {
+                    alert("Please fill in travel date and number of seats before booking!");
+                    return;
+                }
+
+                const redirectUrl = `booking-details.html?type=bus&id=${busId}&travelDate=${encodeURIComponent(travelDate)}&seats=${seats}`;
+                console.log('Redirecting to:', redirectUrl);
+                window.location.href = redirectUrl;
+            } catch (error) {
+                console.error('Error in bookBus:', error);
+                alert(`An error occurred: ${error.message}`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => fetchBuses());
+    </script>
+</body>
+</html>

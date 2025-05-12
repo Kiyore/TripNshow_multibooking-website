@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Upcoming Sports</title>
+    
+    <link rel="stylesheet" href="css/upcoming.css">
+    <link rel="stylesheet" href="css/sports.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                
+                <li><a href="sports.html">Sports</a></li>
+                
+                <li><a href="contact.html">Contact Us</a></li>
+               
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Upcoming Sports Events</h2>
+            <p>Plan ahead and book tickets for future sports events happening after May 2025!</p>
+        </div>
+    </section>
+
+    <!-- Sports Search Form -->
+    <section class="container">
+        <h2>Search Upcoming Sports Events</h2>
+        <div class="search-container sports-search">
+            <form id="sports-search-form" onsubmit="searchSports(event)">
+                <div class="form-group">
+                    <label for="event-name">Event Name:</label>
+                    <input type="text" id="event-name" name="eventName" placeholder="e.g., World Cup Match" required>
+                </div>
+                <div class="form-group">
+                    <label for="city">City:</label>
+                    <input type="text" id="city" name="city" placeholder="e.g., Mumbai" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-date">Event Date:</label>
+                    <input type="date" id="event-date" name="eventDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="tickets">Tickets:</label>
+                    <input type="number" id="tickets" name="tickets" min="1" value="1" required>
+                </div>
+                <button type="submit">Search Events</button>
+            </form>
+        </div>
+
+        <!-- Featured Sports Event -->
+        <div class="featured-sports">
+            <div class="featured-image" style="background-image: url('images/sports/icc-world-cup.jpg');">
+                <span class="featured-badge">Featured Event</span>
+                <span class="discount-badge">20% off</span>
+            </div>
+            <div class="featured-details">
+                <h3>ICC Cricket World Cup: India vs Australia</h3>
+                <p><span class="icon">🏟️</span> Venue: Narendra Modi Stadium, Ahmedabad</p>
+                <p><span class="icon">📅</span> Date: 30 May 2025</p>
+                <p><span class="icon">🕒</span> Time: 2:00 PM</p>
+                <p><span class="icon">🎫</span> Stand: Platinum</p>
+                <p class="description">Experience the thrill of the ICC Cricket World Cup 2025 as India takes on Australia in this high-stakes match at the world's largest cricket stadium.</p>
+                <div class="sports-price">
+                    <span class="original-price">₹8000</span>
+                    <span class="discounted-price">₹6400</span>
+                    <span class="price-note">per ticket</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Sports Events -->
+        <h3>Future Sports Events</h3>
+        <div id="sports-list" class="sports-grid"></div>
+    </section>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Hardcoded sports event data with descriptions
+        const sportsData = [
+            {
+                id: 1,
+                name: "ICC World Cup: England vs Pakistan",
+                venue: "Eden Gardens, Kolkata",
+                date: "20 May 2025",
+                time: "2:00 PM",
+                stand: "Upper Tier",
+                description: "Watch England take on Pakistan in this crucial ICC World Cup match at the historic Eden Gardens stadium.",
+                originalPrice: "6000",
+                price: "4800",
+                discount: "20% off",
+                image: "images/sports/england-pakistan.jpg"
+            },
+            {
+                id: 2,
+                name: "FIFA Club World Cup: Real Madrid vs Al-Hilal",
+                venue: "JLN Stadium, New Delhi",
+                date: "10 June 2025",
+                time: "7:30 PM",
+                stand: "West Stand",
+                description: "Experience top-tier international club football as Real Madrid faces Al-Hilal in this prestigious FIFA Club World Cup match.",
+                originalPrice: "5000",
+                price: "4000",
+                discount: "20% off",
+                image: "images/sports/madrid-hilal.jpg"
+            },
+            {
+                id: 3,
+                name: "Pro Kabaddi Finals 2025",
+                venue: "Indira Gandhi Arena, Delhi",
+                date: "15 June 2025",
+                time: "8:00 PM",
+                stand: "North Stand",
+                description: "Witness the grand finale of the Pro Kabaddi League 2025 season as the top two teams battle for the championship.",
+                originalPrice: "2000",
+                price: "1600",
+                discount: "20% off",
+                image: "images/sports/kabaddi-finals.jpg"
+            },
+            {
+                id: 4,
+                name: "Badminton World Championships: Final",
+                venue: "Gachibowli Indoor Stadium, Hyderabad",
+                date: "20 June 2025",
+                time: "6:00 PM",
+                stand: "East Stand",
+                description: "Catch the thrilling final match of the 2025 Badminton World Championships featuring the world's top players.",
+                originalPrice: "3000",
+                price: "2400",
+                discount: "20% off",
+                image: "images/sports/badminton-world.jpg"
+            },
+            {
+                id: 5,
+                name: "F1 Indian Grand Prix",
+                venue: "Buddh International Circuit, Greater Noida",
+                date: "25 June 2025",
+                time: "1:30 PM",
+                stand: "Main Grandstand",
+                description: "Experience the return of Formula 1 to India at the Buddh International Circuit with the world's top drivers competing for glory.",
+                originalPrice: "15000",
+                price: "12000",
+                discount: "20% off",
+                image: "images/sports/f1-indian-gp.jpg"
+            },
+            {
+                id: 6,
+                name: "IPL 2025: Playoff Qualifier 1",
+                venue: "MA Chidambaram Stadium, Chennai",
+                date: "30 June 2025",
+                time: "7:30 PM",
+                stand: "South Stand",
+                description: "Watch the top two teams from the league stage battle for a direct spot in the IPL 2025 final in this crucial playoff match.",
+                originalPrice: "6000",
+                price: "4800",
+                discount: "20% off",
+                image: "images/sports/ipl-qualifier.jpg"
+            },
+            {
+                id: 7,
+                name: "Tennis Grand Slam Finals",
+                venue: "DLTA Complex, Delhi",
+                date: "5 July 2025",
+                time: "4:00 PM",
+                stand: "Center Court",
+                description: "Witness world-class tennis as champions compete for glory in the finals of this prestigious Grand Slam event.",
+                originalPrice: "4000",
+                price: "3200",
+                discount: "20% off",
+                image: "images/sports/tennis-final.jpg"
+            },
+            {
+                id: 8,
+                name: "India vs Brazil: Football Friendly",
+                venue: "Salt Lake Stadium, Kolkata",
+                date: "10 July 2025",
+                time: "7:00 PM",
+                stand: "Upper Tier",
+                description: "Experience a historic football match as India takes on the mighty Brazil in this international friendly at Salt Lake Stadium.",
+                originalPrice: "5000",
+                price: "4000",
+                discount: "20% off",
+                image: "images/sports/india-brazil.jpg"
+            },
+            {
+                id: 9,
+                name: "Hockey Asia Cup: India vs Pakistan",
+                venue: "Kalinga Stadium, Bhubaneswar",
+                date: "15 July 2025",
+                time: "6:00 PM",
+                stand: "East Stand",
+                description: "Catch the intense rivalry between India and Pakistan in this crucial Hockey Asia Cup match at the world-class Kalinga Stadium.",
+                originalPrice: "2500",
+                price: "2000",
+                discount: "20% off",
+                image: "images/sports/hockey-india-pakistan.jpg"
+            },
+            {
+                id: 10,
+                name: "WWE Live India Tour",
+                venue: "Indira Gandhi Indoor Stadium, Delhi",
+                date: "20 July 2025",
+                time: "7:00 PM",
+                stand: "Ringside",
+                description: "Experience the action and drama of WWE as top superstars perform live in this special India tour event.",
+                originalPrice: "8000",
+                price: "6400",
+                discount: "20% off",
+                image: "images/sports/wwe-india.jpg"
+            }
+        ];
+
+        function fetchSports(filteredSports = sportsData) {
+            const sportsList = document.getElementById('sports-list');
+            sportsList.innerHTML = '';
+            filteredSports.forEach(sport => {
+                sportsList.innerHTML += `
+                    <div class="sports-card">
+                        <div class="sports-image" style="background-image: url('${sport.image}');">
+                            <span class="discount-badge">${sport.discount}</span>
+                        </div>
+                        <div class="sports-details">
+                            <h4>${sport.name}</h4>
+                            <div class="sports-info">
+                                <p><span class="icon">🏟️</span> Venue: ${sport.venue}</p>
+                                <p><span class="icon">📅</span> Date: ${sport.date}</p>
+                                <p><span class="icon">🕒</span> Time: ${sport.time}</p>
+                                <p><span class="icon">🎫</span> Stand: ${sport.stand}</p>
+                                <p class="description">${sport.description}</p>
+                            </div>
+                            <div class="sports-price">
+                                <span class="original-price">₹${sport.originalPrice}</span>
+                                <span class="discounted-price">₹${sport.price}</span>
+                                <span class="price-note">per ticket</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function searchSports(event) {
+            event.preventDefault();
+            const form = document.getElementById('sports-search-form');
+            const formData = new FormData(form);
+            const eventName = formData.get('eventName').toLowerCase();
+            const city = formData.get('city').toLowerCase();
+
+            const filteredSports = sportsData.filter(sport =>
+                sport.name.toLowerCase().includes(eventName) &&
+                sport.venue.toLowerCase().includes(city)
+            );
+
+            if (filteredSports.length === 0) {
+                document.getElementById('sports-list').innerHTML = '<p>No sports events found matching your search.</p>';
+                return;
+            }
+
+            fetchSports(filteredSports);
+        }
+
+        function bookSports(sportId) {
+            if (!requireAuth()) return;
+
+            const form = document.getElementById('sports-search-form');
+            const formData = new FormData(form);
+            const eventDate = formData.get('eventDate');
+            const tickets = formData.get('tickets');
+
+            if (!eventDate || !tickets) {
+                alert("Please fill in the event date and number of tickets before booking!");
+                return;
+            }
+
+            window.location.href = `booking-details.html?sportId=${sportId}&eventDate=${eventDate}&tickets=${tickets}`;
+        }
+
+        function bookFeaturedSports() {
+            if (!requireAuth()) return;
+
+            const form = document.getElementById('sports-search-form');
+            const formData = new FormData(form);
+            const eventDate = formData.get('eventDate');
+            const tickets = formData.get('tickets');
+
+            if (!eventDate || !tickets) {
+                alert("Please fill in the event date and number of tickets before booking!");
+                return;
+            }
+
+            window.location.href = `booking-details.html?sportId=0&eventDate=${eventDate}&tickets=${tickets}&isFeatured=true`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => fetchSports());
+    </script>
+</body>
+</html> 

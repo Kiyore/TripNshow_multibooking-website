@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Home</title>
+    <link rel="stylesheet" href="css/home.css">
+    <style>
+        nav ul {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .auth-buttons {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+        
+        .auth-buttons button {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .auth-buttons button:hover {
+            background-color: #ff5252;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 25px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .close {
+            color: #aaa;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #555;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+        
+        .form-group input:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        
+        .modal-content button[type="submit"],
+        .modal-content button.send-otp {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        
+        .modal-content button[type="submit"]:hover,
+        .modal-content button.send-otp:hover {
+            background-color: #45a049;
+        }
+        
+        .modal-content p {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .modal-content a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .modal-content a:hover {
+            text-decoration: underline;
+        }
+        
+        .modal h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        #user-account a {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-block;
+        }
+        
+        #user-account a:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="flights.html">Flights</a></li>
+                <li><a href="hotels.html">Hotels</a></li>
+                <li><a href="cabs.html">Cabs</a></li>
+                <li><a href="buses.html">Buses</a></li>
+                <li><a href="movies.html">Movies</a></li>
+                <li><a href="concerts.html">Concerts</a></li>
+                <li><a href="sports.html">Sports</a></li>
+                <li><a href="packages.html">Packages</a></li>
+            </ul>
+        </nav>
+        <div class="auth-buttons" id="auth-container">
+            <button id="login-btn" onclick="openLoginModal()">Login</button>
+            <button id="signup-btn" onclick="openSignupModal()">Sign Up</button>
+            <div id="user-account" class="hidden">
+                <a href="account.html">My Account</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <h2 style="text-align: center; padding: 50px; color: #333;">Welcome to TripNShow</h2>
+    </main>
+
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeLoginModal()">×</span>
+            <h2>Login to Your Account</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" name="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group otp-group hidden">
+                    <label for="login-otp">Verification Code</label>
+                    <input type="text" id="login-otp" name="otp" placeholder="Enter your OTP" required>
+                </div>
+                <button type="button" class="send-otp" onclick="sendLoginOTP()">Send Verification Code</button>
+                <button type="submit" class="hidden" id="login-submit">Login</button>
+            </form>
+            <p>Don't have an account? <a href="#" onclick="openSignupModal(); closeLoginModal();">Sign Up</a></p>
+        </div>
+    </div>
+
+    <div id="signup-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSignupModal()">×</span>
+            <h2>Create Your Account</h2>
+            <form id="signup-form">
+                <div class="form-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" name="name" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">Email Address</label>
+                    <input type="email" id="signup-email" name="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-mobile">Mobile Number</label>
+                    <input type="tel" id="signup-mobile" name="mobile" placeholder="Enter your mobile number" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-dob">Date of Birth</label>
+                    <input type="date" id="signup-dob" name="dob" required>
+                </div>
+                <div class="form-group otp-group hidden">
+                    <label for="signup-otp">Verification Code</label>
+                    <input type="text" id="signup-otp" name="otp" placeholder="Enter your OTP" required>
+                </div>
+                <button type="button" class="send-otp" onclick="sendSignupOTP()">Send Verification Code</button>
+                <button type="submit" class="hidden" id="signup-submit">Verify and Sign Up</button>
+            </form>
+            <p>Already have an account? <a href="#" onclick="openLoginModal(); closeSignupModal();">Login</a></p>
+        </div>
+    </div>
+
+    <script>
+        function openLoginModal() {
+            document.getElementById('login-modal').style.display = 'block';
+            document.getElementById('login-form').reset();
+            document.querySelector('#login-form .otp-group').classList.add('hidden');
+            document.querySelector('#login-form .send-otp').classList.remove('hidden');
+            document.getElementById('login-submit').classList.add('hidden');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').style.display = 'none';
+        }
+
+        function openSignupModal() {
+            document.getElementById('signup-modal').style.display = 'block';
+            document.getElementById('signup-form').reset();
+            document.querySelector('#signup-form .otp-group').classList.add('hidden');
+            document.querySelector('#signup-form .send-otp').classList.remove('hidden');
+            document.getElementById('signup-submit').classList.add('hidden');
+        }
+
+        function closeSignupModal() {
+            document.getElementById('signup-modal').style.display = 'none';
+        }
+
+        async function sendLoginOTP() {
+            const email = document.getElementById('login-email').value;
+            if (!email) {
+                alert('Please enter an email address!');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/request-login-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert("Verification code sent! Check your email.");
+                    document.querySelector('#login-form .otp-group').classList.remove('hidden');
+                    document.querySelector('#login-form .send-otp').classList.add('hidden');
+                    document.getElementById('login-submit').classList.remove('hidden');
+                } else {
+                    alert(data.message || 'Failed to send verification code');
+                }
+            } catch (error) {
+                alert('Error sending verification code: ' + error.message);
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const otp = document.getElementById('login-otp').value;
+
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, otp })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('isLoggedIn', 'true');
+                    updateAuthUI();
+                    closeLoginModal();
+                    alert("Login successful!");
+                } else {
+                    alert(data.message || 'Login failed');
+                }
+            } catch (error) {
+                alert('Error during login: ' + error.message);
+            }
+        }
+
+        async function sendSignupOTP() {
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const mobile = document.getElementById('signup-mobile').value;
+            const dob = document.getElementById('signup-dob').value;
+
+            if (!name || !email || !mobile || !dob) {
+                alert('All fields are required!');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, mobile, dob })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert("Verification code sent! Check your email.");
+                    document.querySelector('#signup-form .otp-group').classList.remove('hidden');
+                    document.querySelector('#signup-form .send-otp').classList.add('hidden');
+                    document.getElementById('signup-submit').classList.remove('hidden');
+                } else {
+                    alert(data.message || 'Failed to send verification code');
+                }
+            } catch (error) {
+                alert('Error sending verification code: ' + error.message);
+            }
+        }
+
+        async function handleSignup(event) {
+            event.preventDefault();
+            const email = document.getElementById('signup-email').value;
+            const otp = document.getElementById('signup-otp').value;
+
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, otp })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('isLoggedIn', 'true');
+                    updateAuthUI();
+                    closeSignupModal();
+                    alert("Sign up successful! You can now log in.");
+                } else {
+                    alert(data.message || 'Verification failed');
+                }
+            } catch (error) {
+                alert('Error during verification: ' + error.message);
+            }
+        }
+
+        function updateAuthUI() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const authContainer = document.getElementById('auth-container');
+            
+            if (isLoggedIn) {
+                document.getElementById('login-btn').style.display = 'none';
+                document.getElementById('signup-btn').style.display = 'none';
+                document.getElementById('user-account').classList.remove('hidden');
+            } else {
+                document.getElementById('login-btn').style.display = 'inline-block';
+                document.getElementById('signup-btn').style.display = 'inline-block';
+                document.getElementById('user-account').classList.add('hidden');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateAuthUI();
+            
+            window.onclick = function(event) {
+                const loginModal = document.getElementById('login-modal');
+                const signupModal = document.getElementById('signup-modal');
+                if (event.target === loginModal) {
+                    closeLoginModal();
+                }
+                if (event.target === signupModal) {
+                    closeSignupModal();
+                }
+            };
+        });
+    </script>
+</body>
+</html>

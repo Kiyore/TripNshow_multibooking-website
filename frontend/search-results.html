@@ -1,0 +1,272 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Search Results</title>
+    <link rel="stylesheet" href="css/packages.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/deals.css">
+    <link rel="stylesheet" href="css/contact.css">
+    <link rel="stylesheet" href="css/account.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="packages.html">All Packages</a></li>
+                <li><a href="deals.html">Special Deals</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+                <li><a href="account.html">My Account</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="container">
+        <h2>Search Results</h2>
+        <div id="search-results" class="package-grid"></div>
+        <a href="packages.html" class="back-link">Back to Packages</a>
+    </section>
+
+    <script>
+        const packagesData = [
+            // Same package data as before
+            {
+                "id": 1,
+                "name": "Ladakh",
+                "image": "images/ladakh.jpg",
+                "discount": "20% off",
+                "duration": "7 days and 6 nights",
+                "bookBy": "30 Nov 2024",
+                "rating": "4.8",
+                "originalPrice": "60000",
+                "price": "48000"
+            },
+            {
+                "id": 2,
+                "name": "Rishikesh",
+                "image": "images/rishikesh.jpg",
+                "discount": "15% off",
+                "duration": "4 days and 3 nights",
+                "bookBy": "15 Dec 2024",
+                "rating": "4.6",
+                "originalPrice": "35000",
+                "price": "29750"
+            },
+            {
+                "id": 3,
+                "name": "Manali",
+                "image": "images/manali.jpg",
+                "discount": "25% off",
+                "duration": "6 days and 5 nights",
+                "bookBy": "20 Nov 2024",
+                "rating": "4.7",
+                "originalPrice": "45000",
+                "price": "33750"
+            },
+            {
+                "id": 4,
+                "name": "Jammu & Kashmir",
+                "image": "images/jammu.jpg",
+                "discount": "30% off",
+                "duration": "5 days and 4 nights",
+                "bookBy": "10 Dec 2024",
+                "rating": "4.5",
+                "originalPrice": "40000",
+                "price": "28000"
+            },
+            {
+                "id": 5,
+                "name": "Kerala",
+                "image": "images/kerala.jpg",
+                "discount": "20% off",
+                "duration": "8 days and 7 nights",
+                "bookBy": "25 Nov 2024",
+                "rating": "4.9",
+                "originalPrice": "55000",
+                "price": "44000"
+            },
+            {
+                "id": 6,
+                "name": "Andaman",
+                "image": "images/andaman.jpg",
+                "discount": "35% off",
+                "duration": "6 days and 5 nights",
+                "bookBy": "15 Dec 2024",
+                "rating": "4.8",
+                "originalPrice": "65000",
+                "price": "42250"
+            },
+            {
+                "id": 7,
+                "name": "Spiti Valley",
+                "image": "images/spiti.jpg",
+                "discount": "10% off",
+                "duration": "9 days and 8 nights",
+                "bookBy": "30 Nov 2024",
+                "rating": "4.7",
+                "originalPrice": "70000",
+                "price": "63000"
+            },
+            {
+                "id": 8,
+                "name": "Darjeeling",
+                "image": "images/darjeeling.jpg",
+                "discount": "15% off",
+                "duration": "5 days and 4 nights",
+                "bookBy": "20 Dec 2024",
+                "rating": "4.6",
+                "originalPrice": "38000",
+                "price": "32300"
+            },
+            {
+                "id": 9,
+                "name": "Diu",
+                "image": "images/diu.jpg",
+                "discount": "25% off",
+                "duration": "3 days and 2 nights",
+                "bookBy": "10 Dec 2024",
+                "rating": "4.5",
+                "originalPrice": "30000",
+                "price": "22500"
+            },
+            {
+                "id": 10,
+                "name": "Meghalaya",
+                "image": "images/meghalaya.jpg",
+                "discount": "20% off",
+                "duration": "7 days and 6 nights",
+                "bookBy": "15 Dec 2024",
+                "rating": "4.8",
+                "originalPrice": "50000",
+                "price": "40000"
+            },
+            {
+                "id": 11,
+                "name": "Malaysia",
+                "image": "images/malaysia.jpg",
+                "discount": "30% off",
+                "duration": "5 days and 4 nights",
+                "bookBy": "20 Nov 2024",
+                "rating": "4.6",
+                "originalPrice": "80000",
+                "price": "56000"
+            },
+            {
+                "id": 12,
+                "name": "Vietnam",
+                "image": "images/vietnam.jpg",
+                "discount": "25% off",
+                "duration": "7 days and 6 nights",
+                "bookBy": "30 Nov 2024",
+                "rating": "4.7",
+                "originalPrice": "90000",
+                "price": "67500"
+            },
+            {
+                "id": 13,
+                "name": "Bali",
+                "image": "images/bali.jpg",
+                "discount": "35% off",
+                "duration": "6 days and 5 nights",
+                "bookBy": "15 Dec 2024",
+                "rating": "4.8",
+                "originalPrice": "85000",
+                "price": "55250"
+            },
+            {
+                "id": 14,
+                "name": "Paris",
+                "image": "images/paris.jpg",
+                "discount": "20% off",
+                "duration": "5 days and 4 nights",
+                "bookBy": "10 Dec 2024",
+                "rating": "4.9",
+                "originalPrice": "120000",
+                "price": "96000"
+            },
+            {
+                "id": 15,
+                "name": "Thailand",
+                "image": "images/thailand.jpg",
+                "discount": "30% off",
+                "duration": "6 days and 5 nights",
+                "bookBy": "20 Dec 2024",
+                "rating": "4.7",
+                "originalPrice": "75000",
+                "price": "52500"
+            },
+            // ... (rest of the packages)
+        ];
+
+        function displaySearchResults() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const query = urlParams.get('query');
+            const searchResults = document.getElementById('search-results');
+            
+            if (query) {
+                const filteredPackages = packagesData.filter(pkg =>
+                    pkg.name.toLowerCase().includes(query.toLowerCase())
+                );
+                
+                if (filteredPackages.length === 0) {
+                    searchResults.innerHTML = '<p>No packages found matching your search.</p>';
+                    return;
+                }
+
+                searchResults.innerHTML = '';
+                filteredPackages.forEach(pkg => {
+                    searchResults.innerHTML += `
+                        <div class="package-card">
+                            <div class="package-image" style="background-image: url('${pkg.image || 'default-image.jpg'}');">
+                                <span class="discount-badge">${pkg.discount || '10% off'}</span>
+                                <span class="favorite-icon">❤️</span>
+                            </div>
+                            <div class="package-details">
+                                <h4>${pkg.name}</h4>
+                                <div class="package-info">
+                                    <p><span class="icon">🌞</span> ${pkg.duration || 'N/A'}</p>
+                                    <p><span class="icon">🏨</span> 4 Star Hotels</p>
+                                    <p><span class="icon">🚗</span> Airport Pickup & Drop</p>
+                                    <p><span class="icon">🎯</span> 10 Activities</p>
+                                    <p><span class="icon">🍽️</span> Selected Meals</p>
+                                    <p><span class="icon">⏰</span> Book by ${pkg.bookBy || 'N/A'}</p>
+                                    <p><span class="icon">⭐</span> ${pkg.rating || 'N/A'}</p>
+                                </div>
+                                <div class="package-price">
+                                    <span class="original-price">₹${pkg.originalPrice || '0'}</span>
+                                    <span class="discounted-price">₹${pkg.price}</span>
+                                    <span class="price-note">per person</span>
+                                </div>
+                                <div class="date-picker">
+                                    <label>Select Travel Dates: </label>
+                                    <input type="date" id="travel-dates-${pkg.id}" required>
+                                </div>
+                                <button onclick="bookPackage(${pkg.id})">Book Now</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                searchResults.innerHTML = '<p>Please enter a search query.</p>';
+            }
+        }
+
+        function bookPackage(packageId) {
+            const travelDates = document.getElementById(`travel-dates-${packageId}`).value;
+            if (!travelDates) {
+                alert("Please select travel dates before booking!");
+                return;
+            }
+            window.location.href = `booking-details.html?packageId=${packageId}&travelDates=${travelDates}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', displaySearchResults);
+    </script>
+</body>
+</html>

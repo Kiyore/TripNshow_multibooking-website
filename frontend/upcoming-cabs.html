@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Upcoming Cabs</title>
+    <link rel="stylesheet" href="css/upcoming.css">
+    <link rel="stylesheet" href="css/cabs.css">
+
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> -->
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="cabs.html">Cabs</a></li>
+                <li><a href="upcoming-cabs.html">Upcoming Cabs</a></li>
+                <li><a href="deals.html">Special Deals</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+                <li><a href="account.html">My Account</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Upcoming Cab Services</h2>
+        </div>
+    </section>
+
+    <section class="container">
+        <!-- Featured Cab Service -->
+        <div class="featured-cab">
+            <div class="featured-image" style="background-image: url('images/cabs/premium-cab.jpg');">
+                <span class="featured-badge">Featured Service</span>
+                <span class="discount-badge">25% off</span>
+            </div>
+            <div class="featured-details">
+                <h3>Luxury Airport Transfer</h3>
+                <p><i class="fas fa-taxi icon"></i> Service: Airport Transfer</p>
+                <p><i class="fas fa-building icon"></i> From: Mumbai International Airport</p>
+                <p><i class="fas fa-hotel icon"></i> To: Any Hotel in South Mumbai</p>
+                <p><i class="fas fa-calendar-alt icon"></i> Available From: May 26, 2025</p>
+                <p><i class="fas fa-car icon"></i> Vehicle: Mercedes E-Class</p>
+                <p class="description">Experience luxury and comfort with our premium airport transfer service. Includes complimentary bottled water, Wi-Fi, and a professional chauffeur.</p>
+                <div class="cab-price">
+                    <span class="original-price">₹2000</span>
+                    <span class="discounted-price">₹1500</span>
+                </div>
+            </div>
+        </div>
+
+        <h3>Available Future Cab Services</h3>
+        <div id="cab-list" class="cab-grid">
+            <!-- Cab cards will be populated here -->
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 TripNShow. All Rights Reserved.</p>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Hardcoded cab service data
+        const cabsData = [
+            {
+                id: 1,
+                type: "Economy",
+                service: "City Tour",
+                from: "Any Hotel in Mumbai",
+                to: "Mumbai City Tour",
+                date: "June 5, 2025",
+                vehicle: "Suzuki Swift",
+                description: "Explore Mumbai with our economical city tour package. Includes visits to Gateway of India, Marine Drive, and other iconic landmarks.",
+                originalPrice: "1500",
+                price: "1125",
+                discount: "25% off",
+                image: "images/cabs/economy-cab.jpg"
+            },
+            {
+                id: 2,
+                type: "Premium",
+                service: "Business Transfer",
+                from: "Mumbai Airport",
+                to: "Business District (BKC)",
+                date: "June 10, 2025",
+                vehicle: "Toyota Camry",
+                description: "Premium transportation service for business travelers with priority pickup and professional chauffeurs.",
+                originalPrice: "1800",
+                price: "1350",
+                discount: "25% off",
+                image: "images/cabs/premium-cab.jpg"
+            },
+            {
+                id: 3,
+                type: "Luxury",
+                service: "Wedding Transportation",
+                from: "Any Location in Mumbai",
+                to: "Wedding Venue",
+                date: "June 15, 2025",
+                vehicle: "BMW 5 Series",
+                description: "Luxury transportation for wedding parties with decorated vehicles and premium service.",
+                originalPrice: "3000",
+                price: "2250",
+                discount: "25% off",
+                image: "images/cabs/luxury-cab.jpg"
+            },
+            {
+                id: 4,
+                type: "SUV",
+                service: "Group Tour",
+                from: "Mumbai",
+                to: "Lonavala",
+                date: "June 20, 2025",
+                vehicle: "Toyota Fortuner",
+                description: "Comfortable SUV service for groups or families traveling to Lonavala. Includes stops at scenic viewpoints.",
+                originalPrice: "2500",
+                price: "1875",
+                discount: "25% off",
+                image: "images/cabs/suv-cab.jpg"
+            },
+            {
+                id: 5,
+                type: "Economy",
+                service: "Shopping Tour",
+                from: "Any Hotel in Mumbai",
+                to: "Popular Shopping Malls",
+                date: "June 25, 2025",
+                vehicle: "Hyundai i20",
+                description: "Convenient transportation to Mumbai's best shopping destinations with a flexible 5-hour waiting period.",
+                originalPrice: "1200",
+                price: "900",
+                discount: "25% off",
+                image: "images/cabs/economy-cab.jpg"
+            },
+            {
+                id: 6,
+                type: "Premium",
+                service: "Corporate Event",
+                from: "Corporate Office",
+                to: "Event Venue",
+                date: "June 30, 2025",
+                vehicle: "Honda Accord",
+                description: "Premium transportation service for corporate events with professional chauffeurs in formal attire.",
+                originalPrice: "2000",
+                price: "1500",
+                discount: "25% off",
+                image: "images/cabs/premium-cab.jpg"
+            }
+        ];
+
+        function fetchCabs() {
+            const cabList = document.getElementById('cab-list');
+            cabList.innerHTML = '';
+            cabsData.forEach(cab => {
+                cabList.innerHTML += `
+                    <div class="cab-card">
+                        <div class="cab-image" style="background-image: url('${cab.image}');">
+                            <span class="discount-badge">${cab.discount}</span>
+                        </div>
+                        <div class="cab-details">
+                            <h4>${cab.service}</h4>
+                            <div class="cab-info">
+                                <p><i class="fas fa-taxi icon"></i> Service: ${cab.service}</p>
+                                <p><i class="fas fa-building icon"></i> From: ${cab.from}</p>
+                                <p><i class="fas fa-hotel icon"></i> To: ${cab.to}</p>
+                                <p><i class="fas fa-calendar-alt icon"></i> Date: ${cab.date}</p>
+                                <p><i class="fas fa-car icon"></i> Vehicle: ${cab.vehicle}</p>
+                                <p class="description">${cab.description}</p>
+                            </div>
+                            <div class="cab-price">
+                                <span class="original-price">₹${cab.originalPrice}</span>
+                                <span class="discounted-price">₹${cab.price}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => fetchCabs());
+    </script>
+</body>
+</html>

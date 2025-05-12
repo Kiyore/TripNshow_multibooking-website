@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - User Profile</title>
+    <link rel="stylesheet" href="css/user.css">
+    <link rel="stylesheet" href="css/account.css">
+    <script src="js/auth.js"></script>
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="flights.html">Flights</a></li>
+                <li><a href="hotels.html">Hotels</a></li>
+                <li><a href="cabs.html">Cabs</a></li>
+                <li><a href="buses.html">Buses</a></li>
+                <li><a href="movies.html">Movies</a></li>
+                <li><a href="concerts.html">Concerts</a></li>
+                <li><a href="sports.html">Sports</a></li>
+                <li><a href="packages.html">Packages</a></li>
+                <li id="auth-link">
+                    <a href="#" id="logout-link" class="logout-btn" style="display: none;">Logout</a>
+                    <button id="contact-us-btn" class="contact-us-btn" style="display: inline-block;">Contact Us</button>
+                    <a href="login.html" id="login-link">Login</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="container">
+        <h2>User Profile</h2>
+        <div id="user-info">
+            <p><strong>Name:</strong> <span id="user-name">Loading...</span></p>
+            <p><strong>Email:</strong> <span id="user-email">Loading...</span></p>
+            <p><strong>Mobile:</strong> <span id="user-mobile">Loading...</span></p>
+            <p><strong>Date of Birth:</strong> <span id="user-dob">Loading...</span></p>
+            <p><strong>Wallet Balance:</strong> <span id="user-wallet">Loading...</span></p>
+            <p><strong>Verified:</strong> <span id="user-verified">Loading...</span></p>
+        </div>
+        <h3 id="booking-title">Booking History</h3>
+        <div id="booking-history"></div>
+    </section>
+
+    <footer>
+        <p>© 2025 TripNShow. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        const token = localStorage.getItem('token');
+
+        function requireAuth() {
+            return !!token;
+        }
+
+        function updateAuthLink() {
+            const loginLink = document.getElementById('login-link');
+            const logoutLink = document.getElementById('logout-link');
+            const contactUsBtn = document.getElementById('contact-us-btn');
+
+            if (requireAuth()) {
+                loginLink.style.display = 'none';
+                logoutLink.style.display = 'inline-block';
+                contactUsBtn.style.display = 'inline-block';
+                logoutLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('token');
+                    localStorage.setItem('isLoggedIn', 'false');
+                    alert("You have been logged out!");
+                    window.location.href = "index.html";
+                });
+                contactUsBtn.addEventListener('click', () => {
+                    window.location.href = "contact.html";
+                });
+            } else {
+                loginLink.style.display = 'inline-block';
+                logoutLink.style.display = 'none';
+                contactUsBtn.style.display = 'none';
+            }
+        }
+
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/user/profile', {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch profile');
+
+                const user = await response.json();
+                document.getElementById('user-name').textContent = user.name || 'N/A';
+                document.getElementById('user-email').textContent = user.email || 'N/A';
+                document.getElementById('user-mobile').textContent = user.mobile || 'Not available';
+                document.getElementById('user-dob').textContent = user.dob || 'Not available';
+                document.getElementById('user-wallet').textContent = `₹${user.wallet || '0.00'}`;
+                document.getElementById('user-verified').textContent = user.is_verified ? 'Yes' : 'No';
+            } catch (error) {
+                console.error("Error loading profile:", error);
+                alert("Failed to load profile. Please login again.");
+                localStorage.removeItem("token");
+                window.location.href = "login.html";
+            }
+        }
+
+        async function loadBookingHistory() {
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/user/bookings', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                const bookings = await response.json();
+                const container = document.getElementById('booking-history');
+
+                if (Array.isArray(bookings) && bookings.length) {
+                    container.innerHTML = bookings.map(booking => `
+                        <div class="booking-item" data-id="${booking.id}">
+                            <p><strong>Type:</strong> ${booking.type}</p>
+                            <p><strong>Item ID:</strong> ${booking.itemId}</p>
+                            <p><strong>Date:</strong> ${new Date(booking.booking_date).toLocaleDateString()}</p>
+                            <p><strong>Number of Travelers:</strong> ${booking.no_tickets}</p>
+                            <p><strong>Total Price:</strong> ₹${booking.price || 'N/A'}</p>
+                            <button class="download-btn" onclick="downloadTicket(${booking.id})">Download Ticket</button>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<p>No bookings found.</p>';
+                }
+            } catch (error) {
+                console.error("Error loading bookings:", error);
+                document.getElementById('booking-history').innerHTML = '<p>Failed to load bookings.</p>';
+            }
+        }
+
+        function downloadTicket(bookingId) {
+            const bookingItem = document.querySelector(`.booking-item[data-id="${bookingId}"]`);
+            const ticketContent = `
+                <html>
+                <head><title>TripNShow Ticket</title></head>
+                <body style="font-family: Arial, sans-serif; margin: 20px; text-align: center;">
+                    <h2>TripNShow Ticket</h2>
+                    <p><strong>Booking ID:</strong> ${bookingId}</p>
+                    <p><strong>Type:</strong> ${bookingItem.querySelector('p:nth-child(1)').textContent.replace('Type: ', '')}</p>
+                    <p><strong>Item ID:</strong> ${bookingItem.querySelector('p:nth-child(2)').textContent.replace('Item ID: ', '')}</p>
+                    <p><strong>Date:</strong> ${bookingItem.querySelector('p:nth-child(3)').textContent.replace('Date: ', '')}</p>
+                    <p><strong>Number of Travelers:</strong> ${bookingItem.querySelector('p:nth-child(4)').textContent.replace('Number of Travelers: ', '')}</p>
+                    <p><strong>Total Price:</strong> ${bookingItem.querySelector('p:nth-child(5)').textContent.replace('Total Price: ', '')}</p>
+                </body>
+                </html>
+            `;
+            const blob = new Blob([ticketContent], { type: 'text/html' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ticket_${bookingId}_${Date.now()}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            alert('Ticket downloaded as HTML file. Open it in a browser to view.');
+        }
+
+        if (!requireAuth()) {
+            window.location.href = 'index.html';
+        } else {
+            updateAuthLink();
+            loadUserProfile();
+            loadBookingHistory();
+        }
+    </script>
+</body>
+</html>

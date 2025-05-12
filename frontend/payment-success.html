@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Payment Success</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/payment-success.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+    </header>
+
+    <section class="success-container">
+        <div class="success-card">
+            <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9 12l2 2 4-4"></path>
+            </svg>
+            <div class="success-message">Payment Successful!</div>
+            <div class="success-details">Your payment has successfully completed. You can check your order in my account.</div>
+            <div class="ticket-details" id="ticket-info"></div>
+            <button class="action-button" onclick="downloadTicket()">Download Ticket</button>
+            <button class="action-button" onclick="window.location.href='account.html'">My Account</button>
+            <button class="action-button" onclick="window.location.href='index.html'">Back to Home</button>
+
+            <!-- QR Code Placeholder -->
+            <div id="qrcode" style="margin: 20px auto; width: 150px; height: 150px;"></div>
+        </div>
+
+        <!-- Suggestion Boxes -->
+        <div class="suggestion-section">
+            <h3>You Can Also Book Through TripNShow</h3>
+            <div class="suggestion-grid">
+                <a href="flights.html" class="suggestion-box">
+                    <div class="discount-label">25% Off</div>
+                    <img src="images/flight-last.jpg" alt="Flights">
+                    <p>Flights</p>
+                </a>
+                <a href="hotels.html" class="suggestion-box">
+                    <div class="discount-label">20% Off</div>
+                    <img src="images/hotel-last.jpg" alt="Hotels">
+                    <p>Hotels</p>
+                </a>
+                <a href="packages.html" class="suggestion-box">
+                    <div class="discount-label">30% Off</div>
+                    <img src="images/package-last.jpg" alt="Packages">
+                    <p>Packages</p>
+                </a>
+                <a href="buses.html" class="suggestion-box">
+                    <div class="discount-label">22% Off</div>
+                    <img src="images/bus-last.jpg" alt="Buses">
+                    <p>Buses</p>
+                </a>
+                <a href="cabs.html" class="suggestion-box">
+                    <div class="discount-label">25% Off</div>
+                    <img src="images/cab-last.jpg" alt="Cabs">
+                    <p>Cabs</p>
+                </a>
+                <a href="concerts.html" class="suggestion-box">
+                    <div class="discount-label">28% Off</div>
+                    <img src="images/concert-last.jpg" alt="Concerts">
+                    <p>Concerts</p>
+                </a>
+                <a href="sports.html" class="suggestion-box">
+                    <div class="discount-label">20% Off</div>
+                    <img src="images/sports-last.jpg" alt="Sports">
+                    <p>Sports</p>
+                </a>
+                <a href="movies.html" class="suggestion-box">
+                    <div class="discount-label">23% Off</div>
+                    <img src="images/movie-last.jpg" alt="Movies">
+                    <p>Movies</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ticketInfo = document.getElementById('ticket-info');
+
+            console.log('URL Params:', Object.fromEntries(urlParams)); // Debug log
+
+            // Ensure type is fetched correctly
+            const bookingType = urlParams.get('type') || 'Not Specified';
+            const travelers = JSON.parse(urlParams.get('travelers') || '[]');
+
+            // Format travelers into separate lines
+            let travelersHtml = '';
+            travelers.forEach((traveler, index) => {
+                travelersHtml += `<p>Traveler ${index + 1}: ${traveler.name}, Age: ${traveler.age}</p>`;
+            });
+
+            ticketInfo.innerHTML = `
+                <h3>Booking Summary</h3>
+                  
+                <p><strong>Item:</strong> ${urlParams.get('itemName') || 'N/A'}</p>
+                <p><strong>Date:</strong> ${urlParams.get('travelDate') || 'N/A'}</p>
+                <p><strong>Number of Travelers:</strong> ${urlParams.get('numTravelers') || 'N/A'}</p>
+                <p><strong>Total Price:</strong> ₹${urlParams.get('totalPrice') || '0.00'}</p>
+                <p><strong>Full Name:</strong> ${urlParams.get('fullName') || 'N/A'}</p>
+                <p><strong>Email:</strong> ${urlParams.get('email') || 'N/A'}</p>
+                <p><strong>Phone:</strong> ${urlParams.get('phone') || 'N/A'}</p>
+                ${travelersHtml ? `<h4>Travelers</h4>${travelersHtml}` : ''}
+            `;
+
+            // Generate QR Code
+            new QRCode(document.getElementById('qrcode'), {
+                text: `Booking Type: ${bookingType.get('type')}\n
+                Item: ${urlParams.get('itemName')}\n
+                Date: ${urlParams.get('travelDate')}\n
+                Total Price: ₹${urlParams.get('totalPrice')}`,
+                width: 150,
+                height: 150,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            // Store booking in the database (optional, removed authentication dependency)
+            /*if (token) {
+                try {
+                    const userResponse = await fetch('http://localhost:5000/api/auth/user/profile', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    const user = await userResponse.json();
+                    const userId = user.id;
+
+                    const bookingData = {
+                        userId: userId,
+                        type: bookingType,
+                        itemId: Math.floor(Math.random() * 1000), // Placeholder itemId; replace with actual logic
+                        no_tickets: parseInt(urlParams.get('numTravelers') || 1),
+                        price: parseFloat(urlParams.get('totalPrice') || 0) // Add price to the booking
+                    };
+
+                    await fetch('http://localhost:5000/api/auth/bookings', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}`
+                        },
+                        body: JSON.stringify(bookingData)
+                    });
+                    console.log('Booking stored successfully');
+                } catch (error) {
+                    console.error('Error storing booking:', error);
+                }
+            }*/
+        });
+
+        function downloadTicket() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ticketData = document.getElementById('ticket-info').innerHTML;
+            const fullTicketContent = `
+                <html>
+                <head><title>TripNShow Ticket</title></head>
+                <body style="font-family: Arial, sans-serif; margin: 20px; text-align: center;">
+                    <h2>TripNShow Ticket</h2>
+                    ${ticketData}
+                </body>
+                </html>
+            `;
+            const blob = new Blob([fullTicketContent], { type: 'text/html' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ticket_${urlParams.get('itemName') || 'booking'}_${Date.now()}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            alert('Ticket downloaded as HTML file. Open it in a browser to view.');
+        }
+    </script>
+</body>
+</html>

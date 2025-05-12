@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Upcoming Packages</title>
+    <link rel="stylesheet" href="css/upcoming.css">
+    <link rel="stylesheet" href="css/packages.css">
+    
+    
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                
+                <li><a href="packages.html">All Packages</a></li>
+                
+                <li><a href="contact.html">Contact Us</a></li>
+                
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Upcoming Travel Packages</h2>
+            <p>Plan your future adventures! Book exclusive vacation packages starting after May 25, 2025</p>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2>Future Travel Packages</h2>
+        <div class="search-container">
+            <form id="package-search-form">
+                <div class="form-group">
+                    <label for="destination">Destination:</label>
+                    <input type="text" id="destination" name="destination" placeholder="Where do you want to go?" required>
+                </div>
+                <div class="form-group">
+                    <label for="travel-date">Travel Date:</label>
+                    <input type="date" id="travel-date" name="travelDate" min="2025-05-26" required>
+                </div>
+                <div class="form-group">
+                    <label for="duration">Duration:</label>
+                    <select id="duration" name="duration">
+                        <option value="">Any Duration</option>
+                        <option value="3-5">3-5 days</option>
+                        <option value="6-9">6-9 days</option>
+                        <option value="10+">10+ days</option>
+                    </select>
+                </div>
+                <button type="submit">Search</button>
+            </form>
+        </div>
+
+        <!-- Featured Package -->
+        <div class="featured-package">
+            <div class="featured-image" style="background-image: url('images/japan-sakura.jpg');">
+                <span class="featured-badge">Featured Package</span>
+                <span class="discount-badge">25% off</span>
+            </div>
+            <div class="featured-details">
+                <h3>Japan Cherry Blossom Tour 2026</h3>
+                <p><span class="icon">🌏</span> Destination: Tokyo, Kyoto, Osaka, Hiroshima</p>
+                <p><span class="icon">📅</span> Available From: March 15, 2026</p>
+                <p><span class="icon">⏱️</span> Duration: 10 days and 9 nights</p>
+                <p><span class="icon">🏨</span> Accommodation: 4-5 Star Hotels</p>
+                <p><span class="icon">⭐</span> Rating: 4.9</p>
+                <p class="description">Experience the magical cherry blossom season in Japan with this comprehensive tour package. Visit iconic landmarks, enjoy authentic cuisine, and witness the stunning sakura in full bloom.</p>
+                <div class="package-price">
+                    <span class="original-price">₹180000</span>
+                    <span class="discounted-price">₹135000</span>
+                    <span class="price-note">per person</span>
+                </div>
+            </div>
+        </div>
+
+        <h3>Upcoming Travel Packages</h3>
+        <div id="package-list" class="package-grid"></div>
+    </section>
+
+    <footer>
+        <p>© 2025 TripNShow. All Rights Reserved.</p>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Hardcoded package data for future travel packages
+        const packagesData = [
+            {
+                id: 1,
+                name: "Northern Lights Adventure",
+                destination: "Iceland",
+                image: "images/iceland-northern-lights.jpg",
+                discount: "20% off",
+                duration: "7 days and 6 nights",
+                availableFrom: "May 20, 2025",
+                rating: "4.8",
+                accommodation: "4 Star Hotels",
+                description: "Witness the spectacular Northern Lights in Iceland with this exclusive tour package. Includes glacier hiking, hot springs visits, and whale watching.",
+                originalPrice: "150000",
+                price: "120000"
+            },
+            {
+                id: 2,
+                name: "African Safari Expedition",
+                destination: "Kenya & Tanzania",
+                image: "images/african-safari.jpg",
+                discount: "15% off",
+                duration: "9 days and 8 nights",
+                availableFrom: "July 5, 2025",
+                rating: "4.9",
+                accommodation: "Luxury Safari Lodges",
+                description: "Experience the ultimate African safari adventure across the Maasai Mara and Serengeti. Witness the Great Migration and encounter the Big Five up close.",
+                originalPrice: "220000",
+                price: "187000"
+            },
+            {
+                id: 3,
+                name: "Mediterranean Cruise",
+                destination: "Italy, Greece, Croatia",
+                image: "images/mediterranean-cruise.jpg",
+                discount: "25% off",
+                duration: "8 days and 7 nights",
+                availableFrom: "August 15, 2025",
+                rating: "4.7",
+                accommodation: "Luxury Cruise Ship",
+                description: "Cruise through the crystal blue waters of the Mediterranean and explore historic cities along the coastlines of Italy, Greece, and Croatia.",
+                originalPrice: "180000",
+                price: "135000"
+            },
+            {
+                id: 4,
+                name: "Australian Outback Adventure",
+                destination: "Australia",
+                image: "images/australian-outback.jpg",
+                discount: "20% off",
+                duration: "10 days and 9 nights",
+                availableFrom: "September 1, 2025",
+                rating: "4.6",
+                accommodation: "4 Star Hotels & Wilderness Lodges",
+                description: "Discover the rugged beauty of the Australian Outback, from Uluru to the Great Barrier Reef, with experiences blending adventure and indigenous culture.",
+                originalPrice: "200000",
+                price: "160000"
+            },
+            {
+                id: 5,
+                name: "Peruvian Highlights",
+                destination: "Peru",
+                image: "images/peru-machu-picchu.jpg",
+                discount: "15% off",
+                duration: "8 days and 7 nights",
+                availableFrom: "October 5, 2025",
+                rating: "4.8",
+                accommodation: "Boutique Hotels",
+                description: "Trek to the ancient ruins of Machu Picchu and explore the Sacred Valley of the Incas. Experience authentic Peruvian culture and cuisine.",
+                originalPrice: "160000",
+                price: "136000"
+            },
+            {
+                id: 6,
+                name: "New Zealand Adventure",
+                destination: "New Zealand",
+                image: "images/new-zealand.jpg",
+                discount: "20% off",
+                duration: "12 days and 11 nights",
+                availableFrom: "November 10, 2025",
+                rating: "4.9",
+                accommodation: "4-5 Star Hotels",
+                description: "Experience the breathtaking landscapes of New Zealand, from fjords to mountains, with adrenaline-pumping activities in the adventure capital of the world.",
+                originalPrice: "220000",
+                price: "176000"
+            },
+            {
+                id: 7,
+                name: "Thailand Island Hopping",
+                destination: "Thailand",
+                image: "images/thailand-islands.jpg",
+                discount: "30% off",
+                duration: "9 days and 8 nights",
+                availableFrom: "December 1, 2025",
+                rating: "4.7",
+                accommodation: "Beach Resorts",
+                description: "Explore Thailand's most beautiful islands, including Phuket, Phi Phi, and Krabi. Relax on pristine beaches and dive in crystal clear waters.",
+                originalPrice: "120000",
+                price: "84000"
+            },
+            {
+                id: 8,
+                name: "European Christmas Markets",
+                destination: "Germany, Austria, Czech Republic",
+                image: "images/christmas-markets.jpg",
+                discount: "25% off",
+                duration: "10 days and 9 nights",
+                availableFrom: "December 15, 2025",
+                rating: "4.8",
+                accommodation: "4 Star Hotels",
+                description: "Experience the magic of European Christmas markets across three countries. Enjoy festive traditions, mulled wine, and holiday shopping.",
+                originalPrice: "180000",
+                price: "135000"
+            },
+            {
+                id: 9,
+                name: "Egypt & Nile Cruise",
+                destination: "Egypt",
+                image: "images/egypt-pyramids.jpg",
+                discount: "20% off",
+                duration: "8 days and 7 nights",
+                availableFrom: "January 15, 2026",
+                rating: "4.6",
+                accommodation: "5 Star Hotels & Luxury Nile Cruise",
+                description: "Discover ancient Egyptian wonders from the Pyramids of Giza to the Valley of the Kings. Includes a luxury cruise along the Nile River.",
+                originalPrice: "160000",
+                price: "128000"
+            },
+            {
+                id: 10,
+                name: "South African Wine & Wildlife",
+                destination: "South Africa",
+                image: "images/south-africa.jpg",
+                discount: "15% off",
+                duration: "10 days and 9 nights",
+                availableFrom: "February 5, 2026",
+                rating: "4.7",
+                accommodation: "4-5 Star Hotels & Game Lodges",
+                description: "Combine wine tasting in Cape Town's vineyards with safari adventures at Kruger National Park. Experience the best of South African culture and wildlife.",
+                originalPrice: "190000",
+                price: "161500"
+            }
+        ];
+
+        function fetchPackages(filteredPackages = packagesData) {
+            const packageList = document.getElementById('package-list');
+            packageList.innerHTML = '';
+            filteredPackages.forEach(pkg => {
+                packageList.innerHTML += `
+                    <div class="package-card">
+                        <div class="package-image" style="background-image: url('${pkg.image}');">
+                            <span class="discount-badge">${pkg.discount}</span>
+                        </div>
+                        <div class="package-details">
+                            <h4>${pkg.name}</h4>
+                            <div class="package-info">
+                                <p><span class="icon">🌏</span> Destination: ${pkg.destination}</p>
+                                <p><span class="icon">📅</span> Available From: ${pkg.availableFrom}</p>
+                                <p><span class="icon">⏱️</span> Duration: ${pkg.duration}</p>
+                                <p><span class="icon">🏨</span> Accommodation: ${pkg.accommodation}</p>
+                                <p><span class="icon">⭐</span> Rating: ${pkg.rating}</p>
+                                <p class="description">${pkg.description}</p>
+                            </div>
+                            <div class="package-price">
+                                <span class="original-price">₹${pkg.originalPrice}</span>
+                                <span class="discounted-price">₹${pkg.price}</span>
+                                <span class="price-note">per person</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Search Packages
+        document.getElementById('package-search-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const destination = document.getElementById('destination').value.toLowerCase();
+            const duration = document.getElementById('duration').value;
+            
+            let filteredPackages = packagesData.filter(pkg => {
+                return pkg.destination.toLowerCase().includes(destination);
+            });
+            
+            if (duration) {
+                filteredPackages = filteredPackages.filter(pkg => {
+                    const days = parseInt(pkg.duration.split(' ')[0]);
+                    if (duration === '3-5') return days >= 3 && days <= 5;
+                    if (duration === '6-9') return days >= 6 && days <= 9;
+                    if (duration === '10+') return days >= 10;
+                    return true;
+                });
+            }
+            
+            if (filteredPackages.length === 0) {
+                document.getElementById('package-list').innerHTML = '<p>No packages found matching your search criteria. Please try different options.</p>';
+                return;
+            }
+            
+            fetchPackages(filteredPackages);
+        });
+
+        function bookPackage(packageId) {
+            if (!requireAuth()) return;
+            
+            const travelDate = document.getElementById('travel-date').value;
+            
+            if (!travelDate) {
+                alert("Please select a travel date before booking!");
+                return;
+            }
+            
+            const selectedPackage = packagesData.find(pkg => pkg.id === packageId);
+            
+            if (selectedPackage) {
+                window.location.href = `booking-details.html?packageId=${packageId}&travelDate=${travelDate}`;
+            }
+        }
+
+        function bookFeaturedPackage() {
+            if (!requireAuth()) return;
+            
+            const travelDate = document.getElementById('travel-date').value;
+            
+            if (!travelDate) {
+                alert("Please select a travel date before booking!");
+                return;
+            }
+            
+            window.location.href = `booking-details.html?packageId=0&travelDate=${travelDate}&isFeatured=true`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => fetchPackages());
+    </script>
+</body>
+</html> 

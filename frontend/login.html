@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - TripNShow</title>
+  <link rel="stylesheet" href="css/login.css">
+  <style>
+    /* Remove inline styles since we're using login.css exclusively */
+  </style>
+</head>
+<body>
+  <div class="transparent-wrapper">
+    <div id="loginSection">
+      <h1>Login</h1>
+      <form id="loginForm" novalidate>
+        <label for="loginEmail">Email:</label>
+        <input type="email" id="loginEmail" name="loginEmail" required><br>
+
+        <label for="loginPassword">Password:</label>
+        <input type="password" id="loginPassword" name="loginPassword" required minlength="6"><br>
+
+        <small>Password must be at least 6 characters long.</small><br>
+        <button type="submit">Login</button>
+      </form>
+      <p>Don't have an account? <a href="signup.html" class="toggle-link">Sign Up here</a></p>
+    </div>
+    <p id="message"></p>
+  </div>
+
+  <script>
+    const message = document.getElementById("message");
+    let isSubmitting = false;
+  
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (isSubmitting) return;
+      isSubmitting = true;
+  
+      const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+      const password = document.getElementById("loginPassword").value;
+  
+      if (!email || !password) {
+        message.textContent = "Please enter both email and password.";
+        message.className = "error";
+        isSubmitting = false;
+        return;
+      }
+  
+      const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+      if (!emailRegex.test(email)) {
+        message.textContent = "Please enter a valid email address.";
+        message.className = "error";
+        isSubmitting = false;
+        return;
+      }
+  
+      if (password.length < 6) {
+        message.textContent = "Password must be at least 6 characters.";
+        message.className = "error";
+        isSubmitting = false;
+        return;
+      }
+  
+      try {
+        const response = await fetch('http://localhost:5000/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+  
+        const data = await response.json();
+        console.log('Login response:', response.status, data);
+  
+        if (response.ok && data.token) {
+          saveToken(data.token); // Save token + set isLoggedIn
+          message.textContent = "Login successful! Redirecting...";
+          message.className = "success";
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 1200);
+        } else {
+          message.textContent = data.message || "Login failed. Please try again.";
+          message.className = "error";
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+        message.textContent = error.message.includes("Network")
+          ? "Network error. Please check your connection."
+          : "An error occurred. Please try again later.";
+        message.className = "error";
+      } finally {
+        isSubmitting = false;
+      }
+    });
+  
+    function saveToken(token) {
+      localStorage.setItem("token", token);
+      localStorage.setItem("isLoggedIn", "true"); // ✅ Set login flag
+    }
+  </script>
+</body>
+</html>

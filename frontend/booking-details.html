@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Booking Details</title>
+    <link rel="stylesheet" href="css/book-details.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: black;
+            text-align: center;
+        }
+        #booking-details {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #000000;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #ff9966;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #ff5733;
+        }
+        .traveler-group {
+            margin-top: 15px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="booking-details">
+        <p>Loading booking details...</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const type = urlParams.get('type');
+            const id = urlParams.get('id');
+            const detailsDiv = document.getElementById('booking-details');
+
+            if (!detailsDiv) {
+                console.error('Booking details div not found!');
+                document.body.innerHTML = '<p>Error: Booking details section not loaded. Please check the page structure.</p>';
+                return;
+            }
+
+            const endpoints = {
+                flight: { url: 'flights', name: 'airline_name', availability: 'seats_available' },
+                hotel: { url: 'hotels', name: 'name', availability: 'rooms_available' },
+                bus: { url: 'buses', name: 'bus_name', availability: 'seats_available' },
+                cab: { url: 'cabs', name: 'cab_type', availability: 'seats' },
+                concert: { url: 'concerts', name: 'name', availability: 'seats_available' },
+                movie: { url: 'movies', name: 'title', availability: 'seats_available' },
+                sports: { url: 'sports', name: 'name', availability: 'seats_available' },
+                package: { url: 'packages', name: 'title', availability: 'slots_available' }
+            };
+
+            const endpoint = endpoints[type];
+            if (!endpoint) {
+                detailsDiv.innerHTML = '<p>Invalid booking type.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/${endpoint.url}/${id}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log('Fetched data:', data);
+
+                const travelDate = urlParams.get('travelDate') || urlParams.get('checkInDate') || urlParams.get('concertDate') || urlParams.get('showDate') || urlParams.get('eventDate') || urlParams.get('startDate') || '';
+                console.log('Fetched travelDate:', travelDate); // Debug log
+                const numTravelers = parseInt(urlParams.get('passengers') || urlParams.get('guests') || urlParams.get('seats') || urlParams.get('tickets') || urlParams.get('travelers') || '1');
+
+                detailsDiv.innerHTML = `
+                    <h1>Booking Details</h1>
+                    <h3>Booking For - ${type.charAt(0).toUpperCase() + type.slice(1)}</h3>
+                    <p><strong>ID:</strong> ${data.id || 'N/A'}</p>
+                    <p><strong>Name:</strong> ${data[endpoint.name] || 'N/A'}</p>
+                    <p><strong>Price per person:</strong> ₹${data.price || data.price_per_night || 'N/A'}</p>
+                    <p><strong>Availability:</strong> ${data[endpoint.availability] || 'N/A'} ${type === 'hotel' ? 'rooms' : 'seats/slots'} left</p>
+                    <p><strong>Date:</strong> ${travelDate}</p>
+                    <p><strong>${type === 'hotel' ? 'Guests' : 'Passengers/Tickets'}:</strong> ${numTravelers}</p>
+                    <form id="booking-form" onsubmit="proceedToPayment(event)">
+                        <div class="form-group">
+                            <label for="full-name">Full Name:</label>
+                            <input type="text" id="full-name" name="fullName" placeholder="Your Full Name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" name="email" placeholder="Your Email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number:</label>
+                            <input type="tel" id="phone" name="phone" placeholder="Your Phone Number" required>
+                        </div>
+                        <div id="traveler-details"></div>
+                        <button type="submit">Proceed to Payment</button>
+                    </form>
+                `;
+
+                // Dynamically generate traveler fields
+                const travelerDetails = document.getElementById('traveler-details');
+                for (let i = 1; i <= numTravelers; i++) {
+                    travelerDetails.innerHTML += `
+                        <div class="traveler-group">
+                            <h4>Guest ${i}</h4>
+                            <div class="form-group">
+                                <label for="traveler-name-${i}">Name:</label>
+                                <input type="text" id="traveler-name-${i}" name="travelerName${i}" placeholder="Traveler Name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="traveler-age-${i}">Age:</label>
+                                <input type="number" id="traveler-age-${i}" name="travelerAge${i}" min="1" placeholder="Traveler Age" required>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error fetching booking details:', error);
+                const responseText = await response?.text() || 'No response';
+                console.log('Raw response:', responseText);
+                detailsDiv.innerHTML = `<p>Error loading details: ${error.message}. Please check the console for more information or try again later.</p>`;
+            }
+        });
+
+        async function proceedToPayment(event) {
+            event.preventDefault();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            let type, itemId;
+            for (const [key, config] of Object.entries({
+                flight: { idParam: 'id' }, hotel: { idParam: 'id' }, cab: { idParam: 'id' },
+                bus: { idParam: 'id' }, movie: { idParam: 'id' }, concert: { idParam: 'id' },
+                package: { idParam: 'id' }, sports: { idParam: 'id' }
+            })) {
+                if (urlParams.has(config.idParam)) {
+                    type = key;
+                    itemId = urlParams.get(config.idParam);
+                    break;
+                }
+            }
+
+            if (!type || !itemId) {
+                alert("Invalid booking details. Please try again.");
+                return;
+            }
+
+            const form = document.getElementById('booking-form');
+            const formData = new FormData(form);
+            const numTravelers = parseInt(urlParams.get('passengers') || urlParams.get('guests') || urlParams.get('seats') || urlParams.get('tickets') || urlParams.get('travelers') || '1');
+            const travelers = [];
+
+            for (let i = 1; i <= numTravelers; i++) {
+                travelers.push({
+                    name: formData.get(`travelerName${i}`),
+                    age: parseInt(formData.get(`travelerAge${i}`))
+                });
+            }
+
+            const bookingDetails = {
+                fullName: formData.get('fullName'),
+                email: formData.get('email'),
+                phone: formData.get('phone')
+            };
+
+            const itemDetails = await (async () => {
+                const response = await fetch(`http://localhost:5000/api/${type}s/${itemId}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return await response.json();
+            })();
+
+            if (!itemDetails) {
+                alert(`Could not fetch ${type} details. Please try again later.`);
+                return;
+            }
+
+            const totalPrice = parseFloat(itemDetails.price || itemDetails.price_per_night || '0') * numTravelers;
+
+            const queryString = new URLSearchParams({
+                type: type,
+                itemId: itemId,
+                itemName: itemDetails.name || itemDetails.title || `${itemDetails.source} to ${itemDetails.destination}` || 'Unknown',
+                travelDate: urlParams.get('travelDate') || urlParams.get('checkInDate') || urlParams.get('concertDate') || urlParams.get('showDate') || urlParams.get('eventDate') || urlParams.get('startDate') || '',
+                numTravelers: numTravelers,
+                totalPrice: totalPrice.toFixed(2),
+                fullName: bookingDetails.fullName,
+                email: bookingDetails.email,
+                phone: bookingDetails.phone,
+                travelers: JSON.stringify(travelers)
+            }).toString();
+
+            window.location.href = `payment.html?${queryString}`;
+        }
+    </script>
+</body>
+</html>

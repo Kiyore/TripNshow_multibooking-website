@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Ticket</title>
+    <link rel="stylesheet" href="css/base.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        .ticket-details {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #ff9966;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #ff5733;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+    </header>
+
+    <section class="container">
+        <div class="ticket-details" id="ticket-info"></div>
+        <button onclick="downloadTicket()">Download Ticket</button>
+        <button onclick="window.location.href='index.html'">Back to Home</button>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ticketInfo = document.getElementById('ticket-info');
+            const travelers = JSON.parse(urlParams.get('travelers') || '[]');
+
+            ticketInfo.innerHTML = `
+                <h2>Ticket Confirmation</h2>
+                <p><strong>Booking Type:</strong> ${urlParams.get('type')}</p>
+                <p><strong>Item:</strong> ${urlParams.get('itemName')}</p>
+                <p><strong>Date:</strong> ${urlParams.get('travelDate')}</p>
+                <p><strong>Number of Travelers:</strong> ${urlParams.get('numTravelers')}</p>
+                <p><strong>Total Price:</strong> ₹${urlParams.get('totalPrice')}</p>
+                <p><strong>Full Name:</strong> ${urlParams.get('fullName')}</p>
+                <p><strong>Email:</strong> ${urlParams.get('email')}</p>
+                <p><strong>Phone:</strong> ${urlParams.get('phone')}</p>
+                <h3>Travelers:</h3>
+                ${travelers.map((traveler, index) => `
+                    <p>Traveler ${index + 1}: ${traveler.name}, Age: ${traveler.age}</p>
+                `).join('')}
+            `;
+        });
+
+        function downloadTicket() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ticketData = document.getElementById('ticket-info').innerHTML;
+            const blob = new Blob([ticketData], { type: 'text/html' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ticket_${urlParams.get('type')}_${urlParams.get('itemId')}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            alert('Ticket downloaded as HTML file. Open it in a browser to view.');
+        }
+    </script>
+</body>
+</html>

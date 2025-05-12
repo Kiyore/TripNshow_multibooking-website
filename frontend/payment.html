@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Payment</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/payment.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+    </header>
+
+    <section class="payment-container">
+        <div class="payment-card summary-card">
+            <h2>Booking Summary</h2>
+            <div id="booking-summary"></div>
+        </div>
+        <div class="payment-card payment-options">
+            <h2>Select Payment Method</h2>
+            <div class="payment-grid">
+                <div class="payment-option" onclick="selectPayment('Google Pay')">Google Pay</div>
+                <div class="payment-option" onclick="selectPayment('PhonePe')">PhonePe</div>
+                <div class="payment-option" onclick="selectPayment('Paytm')">Paytm</div>
+                <div class="payment-option" onclick="selectPayment('UPI')">UPI</div>
+                <div class="payment-option" onclick="selectPayment('Net Banking')">Net Banking</div>
+                <div class="payment-option" onclick="selectPayment('Credit/Debit Card')">Credit/Debit Card</div>
+            </div>
+            <button class="pay-button" id="pay-btn" disabled>Pay ₹0.00</button>
+        </div>
+        <div id="payment-animation"></div>
+    </section>
+
+    <script>
+        let selectedMethod = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const summary = document.getElementById('booking-summary');
+            const totalPrice = urlParams.get('totalPrice') || '0.00';
+            const travelers = JSON.parse(urlParams.get('travelers') || '[]');
+
+            console.log('URL Params:', Object.fromEntries(urlParams)); // Debug log
+
+            // Format travelers into separate lines
+            let travelersHtml = '';
+            travelers.forEach(traveler => {
+                travelersHtml += `<p><strong>Name:</strong> ${traveler.name}, <strong>Age:</strong> ${traveler.age}</p>`;
+            });
+
+            summary.innerHTML = `
+                <p><strong>Type:</strong> ${urlParams.get('type') || 'N/A'}</p>
+                <p><strong>Item:</strong> ${urlParams.get('itemName') || 'N/A'}</p>
+                <p><strong>Date:</strong> ${urlParams.get('travelDate') || 'N/A'}</p>
+                <p><strong>Number of Travelers:</strong> ${urlParams.get('numTravelers') || 'N/A'}</p>
+                <p><strong>Total Price:</strong> ₹${totalPrice}</p>
+                <p><strong>Full Name:</strong> ${urlParams.get('fullName') || 'N/A'}</p>
+                <p><strong>Email:</strong> ${urlParams.get('email') || 'N/A'}</p>
+                <p><strong>Phone:</strong> ${urlParams.get('phone') || 'N/A'}</p>
+                ${travelersHtml ? `<h3>Travelers</h3>${travelersHtml}` : ''}
+            `;
+            document.getElementById('pay-btn').textContent = `Pay ₹${totalPrice}`;
+        });
+
+        function selectPayment(method) {
+            const options = document.querySelectorAll('.payment-option');
+            options.forEach(option => option.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            selectedMethod = method;
+            document.getElementById('pay-btn').disabled = false;
+            document.getElementById('pay-btn').textContent = `Pay ₹${new URLSearchParams(window.location.search).get('totalPrice') || '0.00'}`;
+        }
+
+        function simulatePayment() {
+            if (!selectedMethod) {
+                alert('Please select a payment method!');
+                return;
+            }
+            const animation = document.getElementById('payment-animation');
+            const payBtn = document.getElementById('pay-btn');
+            payBtn.disabled = true;
+            animation.style.display = 'block';
+            animation.innerHTML = `Processing payment with ${selectedMethod}... <span class="dotting">⠋</span>`;
+            let dotStage = 0;
+            const dots = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+            const interval = setInterval(() => {
+                animation.innerHTML = `Processing payment with ${selectedMethod}... <span class="dotting">${dots[dotStage]}</span>`;
+                dotStage = (dotStage + 1) % dots.length;
+            }, 200);
+
+            setTimeout(() => {
+                clearInterval(interval);
+                animation.innerHTML = `
+                    <div class="success-animation">
+                        <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9 12l2 2 4-4"></path>
+                        </svg>
+                        <p class="success-message">Payment Successful!</p>
+                        <p class="success-details">Your payment has successfully completed. You can check your order in my account.</p>
+                    </div>
+                `;
+                setTimeout(() => {
+                    window.location.href = `payment-success.html?${window.location.search}`;
+                }, 2000);
+            }, 3000);
+        }
+
+        document.getElementById('pay-btn').addEventListener('click', simulatePayment);
+    </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Payment</title>
+    <!-- Base styles (common to all pages) -->
+    <link rel="stylesheet" href="css/base.css">
+    <!-- Page-specific styles -->
+    <link rel="stylesheet" href="css/payment.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul id="nav-links">
+                <!-- Dynamic navigation will be inserted by JavaScript -->
+            </ul>
+        </nav>
+    </header>
+
+    <section class="container">
+        <h2>Payment</h2>
+        <div class="payment-details">
+            <h3>Booking Summary</h3>
+            <p><strong>Booking:</strong> <span id="booking-type"></span></p>
+            <p><strong>Travel Dates:</strong> <span id="travel-dates"></span></p>
+            <p><strong>Number of Travelers:</strong> <span id="num-travelers"></span></p>
+            <p><strong>Total Price:</strong> ₹<span id="total-price"></span></p>
+
+            <h3>Select Payment Method</h3>
+            <form id="payment-form" onsubmit="confirmPayment(event)">
+                <div class="payment-option">
+                    <input type="radio" id="wallet" name="paymentMethod" value="wallet" required>
+                    <label for="wallet">TripNShow Wallet (Balance: ₹<span id="wallet-balance">Loading...</span>)</label>
+                </div>
+                <div class="payment-option">
+                    <input type="radio" id="credit-card" name="paymentMethod" value="credit-card">
+                    <label for="credit-card">Credit/Debit Card</label>
+                </div>
+                <div class="payment-option">
+                    <input type="radio" id="net-banking" name="paymentMethod" value="net-banking">
+                    <label for="net-banking">Net Banking</label>
+                </div>
+                <div class="payment-option">
+                    <input type="radio" id="upi" name="paymentMethod" value="upi">
+                    <label for="upi">UPI</label>
+                </div>
+                <button type="submit">Confirm Payment</button>
+            </form>
+            <p id="payment-message" style="color: red; display: none;"></p>
+        </div>
+    </section>
+
+    <script src="js/auth.js"></script>
+    <script>
+        let walletBalance = 0;
+
+        async function fetchWalletBalance(userId) {
+            try {
+                const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                const data = await response.json();
+                console.log('Wallet response:', data); // Debug log
+                if (response.ok && data.wallet !== undefined) {
+                    walletBalance = parseFloat(data.wallet);
+                    document.getElementById('wallet-balance').textContent = walletBalance.toLocaleString('en-IN');
+                } else {
+                    throw new Error(data.message || 'Failed to fetch wallet balance');
+                }
+            } catch (error) {
+                console.error('Error fetching wallet balance:', error);
+                document.getElementById('wallet-balance').textContent = 'Error';
+                document.getElementById('payment-message').style.display = 'block';
+                document.getElementById('payment-message').textContent = `Error loading wallet: ${error.message}`;
+            }
+        }
+
+        function displayBookingSummary() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const type = urlParams.get('type');
+            const itemName = urlParams.get('itemName');
+            document.getElementById('booking-type').textContent = type && itemName ? `${type.charAt(0).toUpperCase() + type.slice(1)} - ${itemName}` : 'Unknown Booking';
+            document.getElementById('travel-dates').textContent = urlParams.get('travelDate') || 'Not specified';
+            document.getElementById('num-travelers').textContent = urlParams.get('numTickets') || '0';
+            document.getElementById('total-price').textContent = urlParams.get('totalPrice') || '0.00';
+        }
+
+        async function confirmPayment(event) {
+            event.preventDefault();
+            const urlParams = new URLSearchParams(window.location.search);
+            const form = document.getElementById('payment-form');
+            const formData = new FormData(form);
+            const paymentMethod = formData.get('paymentMethod');
+            const totalPrice = parseFloat(urlParams.get('totalPrice') || 0);
+            const paymentMessage = document.getElementById('payment-message');
+            const user = requireAuth();
+
+            if (!user) {
+                paymentMessage.style.display = 'block';
+                paymentMessage.textContent = "Please log in to proceed with payment.";
+                return;
+            }
+
+            if (!paymentMethod) {
+                paymentMessage.style.display = 'block';
+                paymentMessage.textContent = "Please select a payment method.";
+                return;
+            }
+
+            if (paymentMethod === 'wallet') {
+                if (totalPrice > walletBalance) {
+                    paymentMessage.style.display = 'block';
+                    paymentMessage.textContent = "Insufficient balance in TripNShow Wallet!";
+                    return;
+                }
+                try {
+                    const response = await fetch(`http://localhost:5000/api/users/${user.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                        body: JSON.stringify({ wallet: walletBalance - totalPrice })
+                    });
+                    const data = await response.json();
+                    console.log('Wallet update response:', data); // Debug log
+                    if (!response.ok) throw new Error(data.message || 'Wallet update failed');
+                    walletBalance -= totalPrice;
+                    document.getElementById('wallet-balance').textContent = walletBalance.toLocaleString('en-IN');
+                    paymentMessage.style.display = 'block';
+                    paymentMessage.style.color = 'green';
+                    paymentMessage.textContent = `Payment successful! ₹${totalPrice.toLocaleString('en-IN')} deducted from TripNShow Wallet. New balance: ₹${walletBalance.toLocaleString('en-IN')}`;
+                } catch (error) {
+                    console.error('Wallet update failed:', error);
+                    paymentMessage.style.display = 'block';
+                    paymentMessage.textContent = `Error updating wallet: ${error.message}`;
+                    return;
+                }
+            } else {
+                paymentMessage.style.display = 'block';
+                paymentMessage.style.color = 'green';
+                paymentMessage.textContent = `Payment successful using ${paymentMethod.replace('-', ' ').toUpperCase()}!`;
+            }
+
+            const queryString = urlParams.toString() + `&paymentMethod=${paymentMethod}&bookingNumber=${Math.floor(Math.random() * 1000000)}`;
+            setTimeout(() => {
+                window.location.href = `ticket.html?${queryString}`;
+            }, 2000); // Delay redirect for user feedback
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            displayBookingSummary();
+            const user = requireAuth();
+            if (user) {
+                await fetchWalletBalance(user.id);
+                const navLinks = document.getElementById('nav-links');
+                navLinks.innerHTML = `
+                    <li><a href="account.html">My Account</a></li>
+                    <li><a href="#" onclick="logout(); return false;">Logout</a></li>
+                `;
+            } else {
+                window.location.href = '/login.html';
+            }
+        });
+    </script>
+</body>
+</html>

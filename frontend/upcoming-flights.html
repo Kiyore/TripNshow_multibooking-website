@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Upcoming Flights</title>
+    <link rel="stylesheet" href="css/flights.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="flights.html">Flights</a></li>
+                
+                <li><a href="contact.html">Contact Us</a></li>
+                
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Upcoming Flights</h2>
+            <p>Discover our upcoming flight routes and plan your next journey!</p>
+        </div>
+    </section>
+
+    <!-- Flight Search Form -->
+    <section class="container">
+        <h2>Search Upcoming Flights</h2>
+        <div class="search-container flight-search">
+            <form id="flight-search-form" onsubmit="searchFlights(event)">
+                <div class="form-group">
+                    <label for="from">From:</label>
+                    <input type="text" id="from" name="from" placeholder="e.g., Mumbai" required>
+                </div>
+                <div class="form-group">
+                    <label for="to">To:</label>
+                    <input type="text" id="to" name="to" placeholder="e.g., Delhi" required>
+                </div>
+                <button type="submit">Search Flights</button>
+            </form>
+        </div>
+
+        <!-- Featured Flight -->
+        <div class="featured-flight">
+            <div class="featured-image" style="background-image: url('images/flights/emirates-a380.jpg');">
+                <span class="featured-badge">Featured Flight</span>
+                <span class="discount-badge">15% off</span>
+            </div>
+            <div class="featured-details">
+                <h3>Emirates A380</h3>
+                <p><span class="icon">✈️</span> Flight: EK-501</p>
+                <p><span class="icon">🛫</span> From: Mumbai (BOM)</p>
+                <p><span class="icon">🛬</span> To: Dubai (DXB)</p>
+                <p><span class="icon">📅</span> Date: 20 Jan 2025</p>
+                <p><span class="icon">🕒</span> Departure: 02:30 AM</p>
+                <p><span class="icon">⏱️</span> Duration: 3h 15m</p>
+                <p class="description">Experience luxury in the sky with Emirates A380, featuring premium amenities and exceptional service.</p>
+                <div class="flight-price">
+                    <span class="original-price">₹45000</span>
+                    <span class="discounted-price">₹38250</span>
+                </div>
+                <a href="flights.html" class="view-details-btn">View Details</a>
+            </div>
+        </div>
+
+        <!-- Available Flights -->
+        <h3>Upcoming Flights</h3>
+        <div id="flight-list" class="flight-grid"></div>
+    </section>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Hardcoded flight data with descriptions
+        const flightsData = [
+            {
+                id: 1,
+                airline: "Air India",
+                flightNumber: "AI-101",
+                from: "Mumbai (BOM)",
+                to: "Delhi (DEL)",
+                date: "20 May 2025",
+                departureTime: "08:30 AM",
+                arrivalTime: "10:45 AM",
+                duration: "2h 15m",
+                description: "Experience Air India's premium service on this morning flight from Mumbai to Delhi.",
+                originalPrice: "8000",
+                price: "6800",
+                discount: "15% off",
+                image: "images/flights/air-india-boeing.jpg"
+            },
+            {
+                id: 2,
+                airline: "IndiGo",
+                flightNumber: "6E-205",
+                from: "Delhi (DEL)",
+                to: "Bangalore (BLR)",
+                date: "25 May 2025",
+                departureTime: "10:15 AM",
+                arrivalTime: "12:45 PM",
+                duration: "2h 30m",
+                description: "Fly with IndiGo's efficient service from Delhi to Bangalore, perfect for business travelers.",
+                originalPrice: "7500",
+                price: "6375",
+                discount: "15% off",
+                image: "images/flights/indigo-airbus.jpg"
+            },
+            {
+                id: 3,
+                airline: "Vistara",
+                flightNumber: "UK-835",
+                from: "Mumbai (BOM)",
+                to: "Singapore (SIN)",
+                date: "30 May 2025",
+                departureTime: "11:30 PM",
+                arrivalTime: "05:30 AM",
+                duration: "5h 30m",
+                description: "Experience premium travel with Vistara's overnight flight to Singapore, featuring gourmet meals and spacious seating.",
+                originalPrice: "35000",
+                price: "29750",
+                discount: "15% off",
+                image: "images/flights/vistara-boeing.jpg"
+            },
+            {
+                id: 4,
+                airline: "SpiceJet",
+                flightNumber: "SG-301",
+                from: "Delhi (DEL)",
+                to: "Goa (GOI)",
+                date: "5 Jun 2025",
+                departureTime: "08:45 AM",
+                arrivalTime: "11:15 AM",
+                duration: "2h 30m",
+                description: "Start your Goa vacation with SpiceJet's morning flight, offering great value and reliable service.",
+                originalPrice: "6500",
+                price: "5525",
+                discount: "15% off",
+                image: "images/flights/spicejet-boeing.jpg"
+            },
+            {
+                id: 5,
+                airline: "Qatar Airways",
+                flightNumber: "QR-555",
+                from: "Mumbai (BOM)",
+                to: "Doha (DOH)",
+                date: "20 Mar 2025",
+                departureTime: "01:15 AM",
+                arrivalTime: "03:45 AM",
+                duration: "3h 30m",
+                description: "Travel in luxury with Qatar Airways' premium service to Doha, featuring award-winning hospitality.",
+                originalPrice: "42000",
+                price: "35700",
+                discount: "15% off",
+                image: "images/flights/qatar-airways-boeing.jpg"
+            },
+            {
+                id: 6,
+                airline: "AirAsia",
+                flightNumber: "AK-101",
+                from: "Delhi (DEL)",
+                to: "Bangkok (BKK)",
+                date: "25 Mar 2025",
+                departureTime: "09:30 PM",
+                arrivalTime: "02:30 AM",
+                duration: "5h 00m",
+                description: "Explore Thailand with AirAsia's affordable flight to Bangkok, perfect for budget travelers.",
+                originalPrice: "28000",
+                price: "23800",
+                discount: "15% off",
+                image: "images/flights/airasia-airbus.jpg"
+            },
+            {
+                id: 7,
+                airline: "Singapore Airlines",
+                flightNumber: "SQ-421",
+                from: "Mumbai (BOM)",
+                to: "Singapore (SIN)",
+                date: "30 Mar 2025",
+                departureTime: "10:45 PM",
+                arrivalTime: "05:15 AM",
+                duration: "5h 30m",
+                description: "Experience world-class service with Singapore Airlines' overnight flight to Singapore.",
+                originalPrice: "38000",
+                price: "32300",
+                discount: "15% off",
+                image: "images/flights/singapore-airlines-airbus.jpg"
+            },
+            {
+                id: 8,
+                airline: "GoAir",
+                flightNumber: "G8-101",
+                from: "Delhi (DEL)",
+                to: "Kolkata (CCU)",
+                date: "20 Jun 2025",
+                departureTime: "07:15 AM",
+                arrivalTime: "09:30 AM",
+                duration: "2h 15m",
+                description: "Start your day with GoAir's early morning flight to Kolkata, offering punctual service.",
+                originalPrice: "6000",
+                price: "5100",
+                discount: "15% off",
+                image: "images/flights/goair-airbus.jpg"
+            },
+            {
+                id: 9,
+                airline: "Etihad Airways",
+                flightNumber: "EY-201",
+                from: "Mumbai (BOM)",
+                to: "Abu Dhabi (AUH)",
+                date: "25 Jun 2025",
+                departureTime: "02:15 AM",
+                arrivalTime: "04:45 AM",
+                duration: "3h 30m",
+                description: "Travel in style with Etihad Airways' premium service to Abu Dhabi, featuring luxurious amenities.",
+                originalPrice: "40000",
+                price: "34000",
+                discount: "15% off",
+                image: "images/flights/etihad-airways-boeing.jpg"
+            },
+            {
+                id: 10,
+                airline: "Air India Express",
+                flightNumber: "IX-301",
+                from: "Delhi (DEL)",
+                to: "Dubai (DXB)",
+                date: "30 Jun 2025",
+                departureTime: "09:30 PM",
+                arrivalTime: "12:00 AM",
+                duration: "4h 30m",
+                description: "Explore Dubai with Air India Express' affordable flight, perfect for budget-conscious travelers.",
+                originalPrice: "32000",
+                price: "27200",
+                discount: "15% off",
+                image: "images/flights/air-india-express-boeing.jpg"
+            }
+        ];
+
+        function fetchFlights(filteredFlights = flightsData) {
+            const flightList = document.getElementById('flight-list');
+            flightList.innerHTML = '';
+            filteredFlights.forEach(flight => {
+                flightList.innerHTML += `
+                    <div class="flight-card">
+                        <div class="flight-image" style="background-image: url('${flight.image}');">
+                            <span class="discount-badge">${flight.discount}</span>
+                        </div>
+                        <div class="flight-details">
+                            <h4>${flight.airline}</h4>
+                            <div class="flight-info">
+                                <p><span class="icon">✈️</span> Flight: ${flight.flightNumber}</p>
+                                <p><span class="icon">🛫</span> From: ${flight.from}</p>
+                                <p><span class="icon">🛬</span> To: ${flight.to}</p>
+                                <p><span class="icon">📅</span> Date: ${flight.date}</p>
+                                <p><span class="icon">🕒</span> Departure: ${flight.departureTime}</p>
+                                <p><span class="icon">⏱️</span> Duration: ${flight.duration}</p>
+                                <p class="description">${flight.description}</p>
+                            </div>
+                            <div class="flight-price">
+                                <span class="original-price">₹${flight.originalPrice}</span>
+                                <span class="discounted-price">₹${flight.price}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function searchFlights(event) {
+            event.preventDefault();
+            const form = document.getElementById('flight-search-form');
+            const formData = new FormData(form);
+            const from = formData.get('from').toLowerCase();
+            const to = formData.get('to').toLowerCase();
+
+            const filteredFlights = flightsData.filter(flight =>
+                flight.from.toLowerCase().includes(from) &&
+                flight.to.toLowerCase().includes(to)
+            );
+
+            if (filteredFlights.length === 0) {
+                document.getElementById('flight-list').innerHTML = '<p>No flights found matching your search.</p>';
+                return;
+            }
+
+            fetchFlights(filteredFlights);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => fetchFlights());
+    </script>
+</body>
+</html> 

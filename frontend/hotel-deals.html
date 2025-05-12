@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Hotel Deals</title>
+    <link rel="stylesheet" href="css/packages.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/deals.css">
+    <link rel="stylesheet" href="css/contact.css">
+    <link rel="stylesheet" href="css/account.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="flights.html">Flights</a></li>
+                <li><a href="buses.html">Buses</a></li>
+                <li><a href="concerts.html">Concerts</a></li>
+                <li><a href="movies.html">Movies</a></li>
+                <li><a href="packages.html">Packages</a></li>
+                <li><a href="hotels.html">Hotels</a></li>
+                <li><a href="cabs.html">Cabs</a></li>
+                <li><a href="sports.html">Sports</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+                <li><a href="account.html">My Account</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Grab the Best Hotel Deals Now!</h2>
+            <p>Don’t miss out on our exclusive hotel deals!</p>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2>Hotel Deals</h2>
+        <div id="hotel-deals-list" class="package-grid"></div>
+    </section>
+
+    <script>
+        async function fetchHotelDeals() {
+            const hotelDealsList = document.getElementById('hotel-deals-list');
+            hotelDealsList.innerHTML = '';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/hotels/special-deals');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch hotel deals');
+                }
+                const hotelDeals = await response.json();
+
+                hotelDeals.forEach(hotel => {
+                    hotelDealsList.innerHTML += `
+                        <div class="package-card">
+                            <div class="package-image" style="background-image: url('${hotel.image || 'default-image.jpg'}');">
+                                <span class="discount-badge">${hotel.discount || '10% off'}</span>
+                                <span class="favorite-icon">❤️</span>
+                            </div>
+                            <div class="package-details">
+                                <h4>${hotel.name}</h4>
+                                <div class="package-info">
+                                    <p><span class="icon">🏨</span> ${hotel.city || 'N/A'}</p>
+                                    <p><span class="icon">📅</span> Default Check-in Date: ${hotel.startDate || 'N/A'}</p>
+                                    <p><span class="icon">⭐</span> Rating: ${hotel.rating || 'N/A'}</p>
+                                    <p><span class="icon">🛏️</span> Room Type: ${hotel.roomType || 'N/A'}</p>
+                                </div>
+                                <div class="package-price">
+                                    <span class="original-price">₹${hotel.originalPrice || '0'}</span>
+                                    <span class="discounted-price">₹${hotel.price}</span>
+                                    <span class="price-note">per night</span>
+                                </div>
+                                <div class="date-picker">
+                                    <label>Select Check-in Date: </label>
+                                    <input type="date" id="checkin-dates-${hotel._id}" required>
+                                </div>
+                                <button onclick="bookHotel('${hotel._id}')">Book Now</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error fetching hotel deals:', error);
+                hotelDealsList.innerHTML = '<p>Error loading hotel deals. Please try again later.</p>';
+            }
+        }
+
+        async function bookHotel(hotelId) {
+            const checkinDates = document.getElementById(`checkin-dates-${hotelId}`).value;
+            if (!checkinDates) {
+                alert("Please select a check-in date before booking!");
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/hotels/${hotelId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch hotel details');
+                }
+                const hotel = await response.json();
+
+                const hotelData = {
+                    hotelId: hotelId,
+                    startDate: checkinDates,
+                };
+
+                const bookResponse = await fetch('http://localhost:5000/api/hotels/book-hotel', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0LXVzZXItcmF0aW5nIiwiaWF0IjoxNzI4MjM0NTY3fQ.1a2b3c4d5e6f7g8h9i0j',
+                    },
+                    body: JSON.stringify(hotelData),
+                });
+
+                if (!bookResponse.ok) {
+                    const error = await bookResponse.json();
+                    throw new Error(error.message);
+                }
+
+                const result = await bookResponse.json();
+                alert(result.message);
+
+                const updatedHotelData = {
+                    name: hotel.name,
+                    city: hotel.city,
+                    startDate: checkinDates,
+                    rating: hotel.rating,
+                    roomType: hotel.roomType,
+                    originalPrice: hotel.originalPrice,
+                    price: hotel.price,
+                    discount: hotel.discount,
+                    image: hotel.image,
+                    isSpecialDeal: hotel.isSpecialDeal,
+                };
+
+                const createResponse = await fetch('http://localhost:5000/api/hotels', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0LXVzZXItcmF0aW5nIiwiaWF0IjoxNzI4MjM0NTY3fQ.1a2b3c4d5e6f7g8h9i0j',
+                    },
+                    body: JSON.stringify(updatedHotelData),
+                });
+
+                if (!createResponse.ok) {
+                    const error = await createResponse.json();
+                    throw new Error(error.message);
+                }
+
+                const newHotel = await createResponse.json();
+                window.location.href = `booking-details.html?hotelId=${newHotel._id}&checkinDates=${checkinDates}`;
+            } catch (error) {
+                console.error('Error booking hotel:', error);
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchHotelDeals);
+    </script>
+</body>
+</html>

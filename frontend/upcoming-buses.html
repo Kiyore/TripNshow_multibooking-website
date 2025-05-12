@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Upcoming Buses</title>
+    
+    <link rel="stylesheet" href="css/upcoming.css">
+    <link rel="stylesheet" href="css/buses.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="buses.html">Buses</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+                
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Upcoming Bus Routes</h2>
+            <p>Discover our upcoming bus routes and plan your next journey!</p>
+        </div>
+    </section>
+
+    <!-- Bus Search Form -->
+    <section class="container">
+        <h2>Search Upcoming Bus Routes</h2>
+        <div class="search-container bus-search">
+            <form id="bus-search-form" onsubmit="searchBuses(event)">
+                <div class="form-group">
+                    <label for="from">From:</label>
+                    <input type="text" id="from" name="from" placeholder="e.g., Mumbai" required>
+                </div>
+                <div class="form-group">
+                    <label for="to">To:</label>
+                    <input type="text" id="to" name="to" placeholder="e.g., Delhi" required>
+                </div>
+                <button type="submit">Search Buses</button>
+            </form>
+        </div>
+
+        <!-- Featured Bus -->
+        <div class="featured-bus">
+            <div class="featured-image" style="background-image: url('images/buses/volvo-sleeper.jpg');">
+                <span class="featured-badge">Featured Route</span>
+                <span class="discount-badge">15% off</span>
+            </div>
+            <div class="featured-details">
+                <h3>Volvo Sleeper</h3>
+                <p><span class="icon">🚌</span> Bus: Volvo Sleeper</p>
+                <p><span class="icon">🛣️</span> Route: Mumbai to Delhi</p>
+                <p><span class="icon">📅</span> Starting Date: 20 June 2025</p>
+                <p><span class="icon">🕒</span> Departure: 08:00 PM</p>
+                <p><span class="icon">⏱️</span> Duration: 16h 00m</p>
+                <p><span class="icon">💺</span> Seat Type: Sleeper</p>
+                <p class="description">Travel in comfort with our upcoming Volvo Sleeper bus service from Mumbai to Delhi, featuring spacious berths and onboard amenities.</p>
+                <div class="bus-price">
+                    <span class="original-price">₹2500</span>
+                    <span class="discounted-price">₹2125</span>
+                    <span class="price-note">per person</span>
+                </div>
+                <a href="buses.html" class="view-details-btn">View Details</a>
+            </div>
+        </div>
+
+        <!-- Available Buses -->
+        <h3>Upcoming Bus Routes</h3>
+        <div id="bus-list" class="bus-grid"></div>
+    </section>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Hardcoded bus data with descriptions
+        const busesData = [
+            {
+                id: 1,
+                busName: "Volvo AC Sleeper",
+                route: "Mumbai to Delhi",
+                startingDate: "20 May 2025",
+                departureTime: "08:00 PM",
+                arrivalTime: "08:00 AM",
+                duration: "12h 00m",
+                seatType: "Sleeper",
+                description: "Experience comfortable overnight travel with our upcoming Volvo AC Sleeper bus from Mumbai to Delhi, featuring spacious berths and entertainment options.",
+                originalPrice: "2500",
+                price: "2125",
+                discount: "15% off",
+                image: "images/buses/volvo-sleeper.jpg"
+            },
+            {
+                id: 2,
+                busName: "Mercedes-Benz Multi-Axle",
+                route: "Delhi to Jaipur",
+                startingDate: "20 Sept 2025",
+                departureTime: "10:00 PM",
+                arrivalTime: "05:00 AM",
+                duration: "7h 00m",
+                seatType: "Semi-Sleeper",
+                description: "Experience luxury travel with our upcoming Mercedes-Benz Multi-Axle bus from Delhi to Jaipur, offering premium comfort and safety features.",
+                originalPrice: "1800",
+                price: "1530",
+                discount: "15% off",
+                image: "images/buses/mercedes-benz.jpg"
+            },
+            {
+                id: 3,
+                busName: "Scania AC Sleeper",
+                route: "Bangalore to Chennai",
+                startingDate: "5 May 2025",
+                departureTime: "09:00 PM",
+                arrivalTime: "06:00 AM",
+                duration: "9h 00m",
+                seatType: "Sleeper",
+                description: "Travel in style with our upcoming Scania AC Sleeper bus from Bangalore to Chennai, featuring comfortable berths and onboard amenities.",
+                originalPrice: "2200",
+                price: "1870",
+                discount: "15% off",
+                image: "images/buses/scania-sleeper.jpg"
+            },
+            {
+                id: 4,
+                busName: "Volvo Multi-Axle",
+                route: "Mumbai to Pune",
+                startingDate: "10 June 2025",
+                departureTime: "11:00 PM",
+                arrivalTime: "04:00 AM",
+                duration: "5h 00m",
+                seatType: "Semi-Sleeper",
+                description: "Enjoy a comfortable journey with our upcoming Volvo Multi-Axle bus from Mumbai to Pune, offering premium seating and entertainment options.",
+                originalPrice: "1500",
+                price: "1275",
+                discount: "15% off",
+                image: "images/buses/volvo-multi-axle.jpg"
+            },
+            {
+                id: 5,
+                busName: "Mercedes-Benz Sleeper",
+                route: "Delhi to Agra",
+                startingDate: "15 may 2025",
+                departureTime: "10:30 PM",
+                arrivalTime: "04:30 AM",
+                duration: "6h 00m",
+                seatType: "Sleeper",
+                description: "Travel in luxury with our upcoming Mercedes-Benz Sleeper bus from Delhi to Agra, featuring spacious berths and premium amenities.",
+                originalPrice: "2000",
+                price: "1700",
+                discount: "15% off",
+                image: "images/buses/mercedes-sleeper.jpg"
+            },
+            {
+                id: 6,
+                busName: "Volvo AC Seater",
+                route: "Chennai to Hyderabad",
+                startingDate: "20 July 2025",
+                departureTime: "08:00 PM",
+                arrivalTime: "07:00 AM",
+                duration: "11h 00m",
+                seatType: "Seater",
+                description: "Experience comfortable travel with our upcoming Volvo AC Seater bus from Chennai to Hyderabad, offering spacious seats and entertainment options.",
+                originalPrice: "1800",
+                price: "1530",
+                discount: "15% off",
+                image: "images/buses/volvo-seater.jpg"
+            },
+            {
+                id: 7,
+                busName: "Scania Multi-Axle",
+                route: "Mumbai to Goa",
+                startingDate: "25 Nov 2025",
+                departureTime: "09:00 PM",
+                arrivalTime: "08:00 AM",
+                duration: "11h 00m",
+                seatType: "Semi-Sleeper",
+                description: "Travel in comfort with our upcoming Scania Multi-Axle bus from Mumbai to Goa, featuring premium seating and onboard amenities.",
+                originalPrice: "2500",
+                price: "2125",
+                discount: "15% off",
+                image: "images/buses/scania-multi-axle.jpg"
+            },
+            {
+                id: 8,
+                busName: "Volvo AC Sleeper Plus",
+                route: "Delhi to Kolkata",
+                startingDate: "5 Dec 2025",
+                departureTime: "07:30 PM",
+                arrivalTime: "08:30 AM",
+                duration: "13h 00m",
+                seatType: "Premium Sleeper",
+                description: "Experience luxury travel with our upcoming Volvo AC Sleeper Plus bus from Delhi to Kolkata, featuring spacious berths and premium amenities.",
+                originalPrice: "3500",
+                price: "2975",
+                discount: "15% off",
+                image: "images/buses/volvo-sleeper-plus.jpg"
+            },
+            {
+                id: 9,
+                busName: "Mercedes-Benz AC Seater",
+                route: "Bangalore to Mysore",
+                startingDate: "25 Jun 2025",
+                departureTime: "10:00 PM",
+                arrivalTime: "04:00 AM",
+                duration: "6h 00m",
+                seatType: "Premium Seater",
+                description: "Travel in style with our upcoming Mercedes-Benz AC Seater bus from Bangalore to Mysore, offering comfortable seating and entertainment options.",
+                originalPrice: "1200",
+                price: "1020",
+                discount: "15% off",
+                image: "images/buses/mercedes-seater.jpg"
+            },
+            {
+                id: 10,
+                busName: "Scania AC Sleeper Plus",
+                route: "Mumbai to Ahmedabad",
+                startingDate: "30 Jun 2025",
+                departureTime: "08:30 PM",
+                arrivalTime: "07:30 AM",
+                duration: "11h 00m",
+                seatType: "Premium Sleeper",
+                description: "Experience premium travel with our upcoming Scania AC Sleeper Plus bus from Mumbai to Ahmedabad, featuring luxurious berths and onboard amenities.",
+                originalPrice: "2800",
+                price: "2380",
+                discount: "15% off",
+                image: "images/buses/scania-sleeper-plus.jpg"
+            }
+        ];
+
+        function fetchBuses(filteredBuses = busesData) {
+            const busList = document.getElementById('bus-list');
+            busList.innerHTML = '';
+            filteredBuses.forEach(bus => {
+                busList.innerHTML += `
+                    <div class="bus-card">
+                        <div class="bus-image" style="background-image: url('${bus.image}');">
+                            <span class="discount-badge">${bus.discount}</span>
+                        </div>
+                        <div class="bus-details">
+                            <h4>${bus.busName}</h4>
+                            <div class="bus-info">
+                                <p><span class="icon">🚌</span> Bus: ${bus.busName}</p>
+                                <p><span class="icon">🛣️</span> Route: ${bus.route}</p>
+                                <p><span class="icon">📅</span> Starting Date: ${bus.startingDate}</p>
+                                <p><span class="icon">🕒</span> Departure: ${bus.departureTime}</p>
+                                <p><span class="icon">⏱️</span> Duration: ${bus.duration}</p>
+                                <p><span class="icon">💺</span> Seat Type: ${bus.seatType}</p>
+                                <p class="description">${bus.description}</p>
+                            </div>
+                            <div class="bus-price">
+                                <span class="original-price">₹${bus.originalPrice}</span>
+                                <span class="discounted-price">₹${bus.price}</span>
+                                <span class="price-note">per person</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function searchBuses(event) {
+            event.preventDefault();
+            const form = document.getElementById('bus-search-form');
+            const formData = new FormData(form);
+            const from = formData.get('from').toLowerCase();
+            const to = formData.get('to').toLowerCase();
+
+            const filteredBuses = busesData.filter(bus =>
+                bus.route.toLowerCase().includes(from) &&
+                bus.route.toLowerCase().includes(to)
+            );
+
+            if (filteredBuses.length === 0) {
+                document.getElementById('bus-list').innerHTML = '<p>No buses found matching your search.</p>';
+                return;
+            }
+
+            fetchBuses(filteredBuses);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => fetchBuses());
+    </script>
+</body>
+</html> 

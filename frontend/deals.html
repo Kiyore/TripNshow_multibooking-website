@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Special Deals</title>
+    <link rel="stylesheet" href="css/packages.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/deals.css">
+    <link rel="stylesheet" href="css/contact.css">
+    <link rel="stylesheet" href="css/account.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="packages.html">All Packages</a></li>
+                <li><a href="deals.html">Special Deals</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+                <li><a href="account.html">My Account</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Grab the Best Deals Now!</h2>
+            <p>Don’t miss out on our exclusive special deals – book your dream vacation today!</p>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2>Special Deals</h2>
+        <div id="special-deals-list" class="package-grid"></div>
+    </section>
+
+    <script>
+        async function fetchSpecialDeals() {
+            const specialDealsList = document.getElementById('special-deals-list');
+            specialDealsList.innerHTML = '';
+
+            try {
+                // Fetch special deals from the backend
+                const response = await fetch('http://localhost:5000/api/packages/special-deals');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch special deals');
+                }
+                const specialDeals = await response.json();
+
+                // Render each special deal
+                specialDeals.forEach(pkg => {
+                    specialDealsList.innerHTML += `
+                        <div class="package-card">
+                            <div class="package-image" style="background-image: url('${pkg.image || 'default-image.jpg'}');">
+                                <span class="discount-badge">${pkg.discount || '10% off'}</span>
+                                <span class="favorite-icon">❤️</span>
+                            </div>
+                            <div class="package-details">
+                                <h4>${pkg.name}</h4>
+                                <div class="package-info">
+                                    <p><span class="icon">📍</span> ${pkg.destination || 'N/A'}</p>
+                                    <p><span class="icon">📅</span> Default Start Date: ${pkg.startDate || 'N/A'}</p>
+                                    <p><span class="icon">🌞</span> ${pkg.duration || 'N/A'}</p>
+                                    <p><span class="icon">🏨</span> 4 Star Hotels</p>
+                                    <p><span class="icon">🚗</span> Airport Pickup & Drop</p>
+                                    <p><span class="icon">🎯</span> 10 Activities</p>
+                                    <p><span class="icon">🍽️</span> Selected Meals</p>
+                                    <p><span class="icon">⏰</span> Book by ${pkg.bookBy || 'N/A'}</p>
+                                    <p><span class="icon">⭐</span> ${pkg.rating || 'N/A'}</p>
+                                </div>
+                                <div class="package-price">
+                                    <span class="original-price">₹${pkg.originalPrice || '0'}</span>
+                                    <span class="discounted-price">₹${pkg.price}</span>
+                                    <span class="price-note">per person</span>
+                                </div>
+                                <div class="date-picker">
+                                    <label>Select Travel Dates: </label>
+                                    <input type="date" id="travel-dates-${pkg._id}" required>
+                                </div>
+                                <button onclick="bookPackage('${pkg._id}')">Book Now</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error fetching special deals:', error);
+                specialDealsList.innerHTML = '<p>Error loading special deals. Please try again later.</p>';
+            }
+        }
+
+        async function bookPackage(packageId) {
+            const travelDates = document.getElementById(`travel-dates-${packageId}`).value;
+            if (!travelDates) {
+                alert("Please select travel dates before booking!");
+                return;
+            }
+
+            try {
+                // Fetch the package details from the backend
+                const response = await fetch(`http://localhost:5000/api/packages/${packageId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch package details');
+                }
+                const pkg = await response.json();
+
+                // Prepare the package data with the user-selected startDate
+                const packageData = {
+                    packageId: packageId,
+                    startDate: travelDates,
+                };
+
+                // Send a POST request to book the package
+                const bookResponse = await fetch('http://localhost:5000/api/packages/book-package', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0LXVzZXItcmF0aW5nIiwiaWF0IjoxNzI4MjM0NTY3fQ.1a2b3c4d5e6f7g8h9i0j', // Hardcoded token for testing
+                    },
+                    body: JSON.stringify(packageData),
+                });
+
+                if (!bookResponse.ok) {
+                    const error = await bookResponse.json();
+                    throw new Error(error.message);
+                }
+
+                const result = await bookResponse.json();
+                alert(result.message);
+
+                // Update the package with the new startDate using POST /
+                const updatedPackageData = {
+                    name: pkg.name,
+                    destination: pkg.destination,
+                    startDate: travelDates,
+                    price: pkg.price,
+                    image: pkg.image,
+                    discount: pkg.discount,
+                    duration: pkg.duration,
+                    bookBy: pkg.bookBy,
+                    rating: pkg.rating,
+                    originalPrice: pkg.originalPrice,
+                    isSpecialDeal: pkg.isSpecialDeal,
+                };
+
+                const createResponse = await fetch('http://localhost:5000/api/packages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0LXVzZXItcmF0aW5nIiwiaWF0IjoxNzI4MjM0NTY3fQ.1a2b3c4d5e6f7g8h9i0j', // Hardcoded token for testing
+                    },
+                    body: JSON.stringify(updatedPackageData),
+                });
+
+                if (!createResponse.ok) {
+                    const error = await createResponse.json();
+                    throw new Error(error.message);
+                }
+
+                const newPackage = await createResponse.json();
+                window.location.href = `booking-details.html?packageId=${newPackage._id}&travelDates=${travelDates}`;
+            } catch (error) {
+                console.error('Error booking package:', error);
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchSpecialDeals);
+    </script>
+</body>
+</html>

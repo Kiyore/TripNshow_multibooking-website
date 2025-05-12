@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Flight Deals</title>
+    <link rel="stylesheet" href="css/packages.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/deals.css">
+    <link rel="stylesheet" href="css/contact.css">
+    <link rel="stylesheet" href="css/account.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="flights.html">Flights</a></li>
+                <li><a href="buses.html">Buses</a></li>
+                <li><a href="concerts.html">Concerts</a></li>
+                <li><a href="movies.html">Movies</a></li>
+                <li><a href="packages.html">Packages</a></li>
+                <li><a href="hotels.html">Hotels</a></li>
+                <li><a href="cabs.html">Cabs</a></li>
+                <li><a href="sports.html">Sports</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+                <li><a href="account.html">My Account</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Grab the Best Flight Deals Now!</h2>
+            <p>Don’t miss out on our exclusive flight deals!</p>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2>Flight Deals</h2>
+        <div id="flight-deals-list" class="package-grid"></div>
+    </section>
+
+    <script>
+        async function fetchFlightDeals() {
+            const flightDealsList = document.getElementById('flight-deals-list');
+            flightDealsList.innerHTML = '';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/flights/special-deals');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch flight deals');
+                }
+                const flightDeals = await response.json();
+
+                flightDeals.forEach(flight => {
+                    flightDealsList.innerHTML += `
+                        <div class="package-card">
+                            <div class="package-image" style="background-image: url('${flight.image || 'default-image.jpg'}');">
+                                <span class="discount-badge">${flight.discount || '10% off'}</span>
+                                <span class="favorite-icon">❤️</span>
+                            </div>
+                            <div class="package-details">
+                                <h4>${flight.departureCity} to ${flight.destinationCity}</h4>
+                                <div class="package-info">
+                                    <p><span class="icon">✈️</span> ${flight.airline || 'N/A'}</p>
+                                    <p><span class="icon">📅</span> Default Start Date: ${flight.startDate || 'N/A'}</p>
+                                    <p><span class="icon">🕒</span> Departure: ${flight.departureTime || 'N/A'}</p>
+                                    <p><span class="icon">🕔</span> Arrival: ${flight.arrivalTime || 'N/A'}</p>
+                                    <p><span class="icon">⏳</span> Duration: ${flight.duration || 'N/A'}</p>
+                                    <p><span class="icon">🔢</span> Flight Number: ${flight.flightNumber || 'N/A'}</p>
+                                </div>
+                                <div class="package-price">
+                                    <span class="original-price">₹${flight.originalPrice || '0'}</span>
+                                    <span class="discounted-price">₹${flight.price}</span>
+                                    <span class="price-note">per person</span>
+                                </div>
+                                <div class="date-picker">
+                                    <label>Select Travel Date: </label>
+                                    <input type="date" id="travel-dates-${flight._id}" required>
+                                </div>
+                                <button onclick="bookFlight('${flight._id}')">Book Now</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error fetching flight deals:', error);
+                flightDealsList.innerHTML = '<p>Error loading flight deals. Please try again later.</p>';
+            }
+        }
+
+        async function bookFlight(flightId) {
+            const travelDates = document.getElementById(`travel-dates-${flightId}`).value;
+            if (!travelDates) {
+                alert("Please select a travel date before booking!");
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/flights/${flightId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch flight details');
+                }
+                const flight = await response.json();
+
+                const flightData = {
+                    flightId: flightId,
+                    startDate: travelDates,
+                };
+
+                const bookResponse = await fetch('http://localhost:5000/api/flights/book-flight', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0LXVzZXItcmF0aW5nIiwiaWF0IjoxNzI4MjM0NTY3fQ.1a2b3c4d5e6f7g8h9i0j',
+                    },
+                    body: JSON.stringify(flightData),
+                });
+
+                if (!bookResponse.ok) {
+                    const error = await bookResponse.json();
+                    throw new Error(error.message);
+                }
+
+                const result = await bookResponse.json();
+                alert(result.message);
+
+                const updatedFlightData = {
+                    departureCity: flight.departureCity,
+                    destinationCity: flight.destinationCity,
+                    flightNumber: flight.flightNumber,
+                    duration: flight.duration,
+                    departureTime: flight.departureTime,
+                    arrivalTime: flight.arrivalTime,
+                    airline: flight.airline,
+                    originalPrice: flight.originalPrice,
+                    price: flight.price,
+                    discount: flight.discount,
+                    image: flight.image,
+                    startDate: travelDates,
+                    isSpecialDeal: flight.isSpecialDeal,
+                };
+
+                const createResponse = await fetch('http://localhost:5000/api/flights', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0LXVzZXItcmF0aW5nIiwiaWF0IjoxNzI4MjM0NTY3fQ.1a2b3c4d5e6f7g8h9i0j',
+                    },
+                    body: JSON.stringify(updatedFlightData),
+                });
+
+                if (!createResponse.ok) {
+                    const error = await createResponse.json();
+                    throw new Error(error.message);
+                }
+
+                const newFlight = await createResponse.json();
+                window.location.href = `booking-details.html?flightId=${newFlight._id}&travelDates=${travelDates}`;
+            } catch (error) {
+                console.error('Error booking flight:', error);
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchFlightDeals);
+    </script>
+</body>
+</html>

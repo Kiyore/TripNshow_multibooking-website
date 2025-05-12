@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TripNShow - Signup</title>
+  <link rel="stylesheet" href="css/signup.css">
+</head>
+<body>
+  <div class="transparent-wrapper">
+    <div id="signupSection" role="form" aria-label="Signup Form">
+      <h1>Sign Up</h1>
+      <form id="signupForm" novalidate>
+        <label for="name">Name:</label><input type="text" id="name" name="name" required><br />
+        <label for="email">Email:</label><input type="email" id="email" name="email" required><br />
+        <label for="password">Password:</label><input type="password" id="password" name="password" required minlength="6"><br />
+        <small>Password must be at least 6 characters long.</small><br />
+        <button type="submit">Sign Up</button>
+      </form>
+      <p>Already have an account? <a href="login.html" class="toggle-link">Login here</a></p>
+    </div>
+    <p id="message"></p>
+  </div>
+
+  <script>
+    const signupSection = document.getElementById("signupSection");
+    const message = document.getElementById("message");
+    let isSubmitting = false;
+
+    document.getElementById("signupForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (isSubmitting) return;
+      isSubmitting = true;
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const password = document.getElementById("password").value;
+
+      if (!name || !email || !password) {
+        message.textContent = "Please fill in all fields.";
+        message.className = "error";
+        isSubmitting = false;
+        return;
+      }
+      if (password.length < 6) {
+        message.textContent = "Password must be at least 6 characters.";
+        message.className = "error";
+        isSubmitting = false;
+        return;
+      }
+
+      try {
+        const response = await fetch("http://localhost:5000/api/auth/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await response.json(); // ✅ Fixed: parse JSON directly
+
+        if (response.ok && data.token) {
+          saveToken(data.token);
+          message.textContent = "Signup successful! Redirecting...";
+          message.className = "success";
+          setTimeout(() => {
+            window.location.href = "login.html";
+          }, 1500);
+        } else {
+          message.textContent = data.message || "Signup failed due to server error.";
+          message.className = "error";
+        }
+      } catch (error) {
+        console.error("Signup Error Details:", error);
+        message.textContent = error.message.includes("Network")
+          ? "Network error. Please check your connection."
+          : "An error occurred. Please try again later.";
+        message.className = "error";
+      } finally {
+        isSubmitting = false;
+      }
+    });
+
+    function saveToken(token) {
+      localStorage.setItem("token", token);
+    }
+
+    console.log("Signup page loaded");
+  </script>
+</body>
+</html>

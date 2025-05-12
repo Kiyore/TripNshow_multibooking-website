@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Sports</title>
+    <link rel="stylesheet" href="css/sports.css">
+    
+    
+    
+    <link rel="stylesheet" href="css/sport_deals.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="sports.html">Sports</a></li>
+                <li><a href="upcoming-sports.html">Upcoming Sports</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Book Your Sport Tickets Today!</h2>
+            <p>Explore the world with ease – cheer for your favorite teams live!</p>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2>Search Sports Events</h2>
+        <div class="search-container sport-search">
+            <form id="sport-search-form" onsubmit="searchSports(event)">
+                <div class="form-group">
+                    <label for="city">City:</label>
+                    <input type="text" id="city" name="city" placeholder="e.g., Mumbai" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-date">Event Date:</label>
+                    <input type="date" id="event-date" name="eventDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="tickets">Tickets:</label>
+                    <input type="number" id="tickets" name="tickets" min="1" value="1" required>
+                </div>
+                <button type="submit">Search Sports</button>
+            </form>
+        </div>
+
+        <h3>Available Sports Events</h3>
+        <div id="sport-list" class="sport-grid"></div>
+    </section>
+
+    <script src="js/auth.js"></script>
+    <script>
+        let allSports = [];
+
+        async function fetchSports() {
+            const sportList = document.getElementById('sport-list');
+            sportList.innerHTML = '<p>Loading sports events...</p>';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/sports');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const raw = await response.text();
+                console.log('API Response:', raw);
+                allSports = raw ? JSON.parse(raw) : [];
+                console.log('All Sports:', allSports);
+
+                if (!allSports || allSports.length === 0) {
+                    sportList.innerHTML = '<p>No sports events available.</p>';
+                    return;
+                }
+
+                displaySports(allSports);
+            } catch (error) {
+                console.error('Error fetching sports:', error);
+                sportList.innerHTML = `<p>Error loading sports: ${error.message}. Please try again later.</p>`;
+            }
+        }
+
+        function displaySports(sports) {
+            const sportList = document.getElementById('sport-list');
+            sportList.innerHTML = '';
+            sports.forEach(sport => {
+                sportList.innerHTML += `
+                    <div class="sport-card">
+                        <img class="card-img" src="${sport.image_path || '/images/sports/default.jpg'}" alt="${sport.name || 'Sport Image'}" />
+                        <div class="sport-details">
+                            <h4>${sport.name || 'N/A'}</h4>
+                            <div class="sport-info">
+                                <p><span class="icon">🏟️</span> Teams: ${sport.team1 || 'N/A'} vs ${sport.team2 || 'N/A'}</p>
+                                <p><span class="icon">📍</span> Venue: ${sport.venue || 'N/A'}</p>
+                                <p><span class="icon">🌐</span> Map: 
+                                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(sport.venue || '')}" target="_blank">
+                                        View on Map
+                                    </a>
+                                </p>
+                                <p><span class="icon">📅</span> Date: ${sport.date || 'N/A'}</p>
+                                <p><span class="icon">⏰</span> Time: ${sport.time || 'N/A'}</p>
+                            </div>
+                            <div class="sport-price">
+                                <span class="discounted-price">₹${sport.price || 'N/A'}</span>
+                                <span class="price-note">per ticket</span>
+                            </div>
+                            <button onclick="bookSport(${sport.id || 0})">Book Now</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function searchSports(event) {
+            event.preventDefault();
+            const form = document.getElementById('sport-search-form');
+            const formData = new FormData(form);
+            const city = formData.get('city').toLowerCase().trim();
+
+            if (!city) {
+                alert("Please fill out the city.");
+                return;
+            }
+
+            console.log('Searching for:', { city });
+
+            const filteredSports = allSports.filter(sport =>
+                sport.venue?.toLowerCase().includes(city)
+            );
+
+            if (filteredSports.length === 0) {
+                document.getElementById('sport-list').innerHTML = '<p>No sports events found matching your search.</p>';
+            } else {
+                displaySports(filteredSports);
+            }
+        }
+
+        function bookSport(sportId) {
+            console.log('bookSport called with sportId:', sportId); // Debug log
+            try {
+                if (typeof requireAuth !== 'function') {
+                    console.error('requireAuth is not defined. Proceeding without authentication for testing.');
+                    // Uncomment the next line to enforce authentication
+                    //return;
+                } else if (!requireAuth()) {
+                    alert("Please log in to book a sport ticket.");
+                    return;
+                }
+
+                const form = document.getElementById('sport-search-form');
+                if (!form) {
+                    console.error('Form not found!');
+                    alert("Error: Form not found. Please reload the page.");
+                    return;
+                }
+
+                const formData = new FormData(form);
+                const eventDate = formData.get('eventDate');
+                const tickets = formData.get('tickets');
+
+                if (!eventDate || !tickets) {
+                    alert("Please fill in event date and number of tickets before booking!");
+                    return;
+                }
+
+                const redirectUrl = `booking-details.html?type=sports&id=${sportId}&eventDate=${encodeURIComponent(eventDate)}&tickets=${tickets}`;
+                console.log('Redirecting to:', redirectUrl);
+                window.location.href = redirectUrl;
+            } catch (error) {
+                console.error('Error in bookSport:', error);
+                alert(`An error occurred: ${error.message}`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => fetchSports());
+    </script>
+</body>
+</html>

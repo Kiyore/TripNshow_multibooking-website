@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Concert Deals</title>
+    <link rel="stylesheet" href="css/packages.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/de Wals.css">
+    <link rel="stylesheet" href="css/contact.css">
+    <link rel="stylesheet" href="css/account.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="flights.html">Flights</a></li>
+                <li><a href="buses.html">Buses</a></li>
+                <li><a href="concerts.html">Concerts</a></li>
+                <li><a href="movies.html">Movies</a></li>
+                <li><a href="packages.html">Packages</a></li>
+                <li><a href="hotels.html">Hotels</a></li>
+                <li><a href="cabs.html">Cabs</a></li>
+                <li><a href="sports.html">Sports</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+                <li><a href="account.html">My Account</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Grab the Best Concert Deals Now!</h2>
+            <p>Don’t miss out on our exclusive concert deals!</p>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2>Concert Deals</h2>
+        <div id="concert-deals-list" class="package-grid"></div>
+    </section>
+
+    <script>
+        async function fetchConcertDeals() {
+            const concertDealsList = document.getElementById('concert-deals-list');
+            concertDealsList.innerHTML = '';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/concerts/special-deals');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch concert deals');
+                }
+                const concertDeals = await response.json();
+
+                concertDeals.forEach(concert => {
+                    concertDealsList.innerHTML += `
+                        <div class="package-card">
+                            <div class="package-image" style="background-image: url('${concert.image || 'default-image.jpg'}');">
+                                <span class="discount-badge">${concert.discount || '10% off'}</span>
+                                <span class="favorite-icon">❤️</span>
+                            </div>
+                            <div class="package-details">
+                                <h4>${concert.artist}</h4>
+                                <div class="package-info">
+                                    <p><span class="icon">🎤</span> Venue: ${concert.venue || 'N/A'}</p>
+                                    <p><span class="icon">📍</span> City: ${concert.city || 'N/A'}</p>
+                                    <p><span class="icon">📅</span> Default Start Date: ${concert.startDate || 'N/A'}</p>
+                                    <p><span class="icon">🕒</span> Time: ${concert.time || 'N/A'}</p>
+                                </div>
+                                <div class="package-price">
+                                    <span class="original-price">₹${concert.originalPrice || '0'}</span>
+                                    <span class="discounted-price">₹${concert.price}</span>
+                                    <span class="price-note">per ticket</span>
+                                </div>
+                                <div class="date-picker">
+                                    <label>Select Concert Date: </label>
+                                    <input type="date" id="concert-dates-${concert._id}" required>
+                                </div>
+                                <button onclick="bookConcert('${concert._id}')">Book Now</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error fetching concert deals:', error);
+                concertDealsList.innerHTML = '<p>Error loading concert deals. Please try again later.</p>';
+            }
+        }
+
+        async function bookConcert(concertId) {
+            const concertDates = document.getElementById(`concert-dates-${concertId}`).value;
+            if (!concertDates) {
+                alert("Please select a concert date before booking!");
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/concerts/${concertId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch concert details');
+                }
+                const concert = await response.json();
+
+                const concertData = {
+                    concertId: concertId,
+                    startDate: concertDates,
+                };
+
+                const bookResponse = await fetch('http://localhost:5000/api/concerts/book-concert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0LXVzZXItcmF0aW5nIiwiaWF0IjoxNzI4MjM0NTY3fQ.1a2b3c4d5e6f7g8h9i0j',
+                    },
+                    body: JSON.stringify(concertData),
+                });
+
+                if (!bookResponse.ok) {
+                    const error = await bookResponse.json();
+                    throw new Error(error.message);
+                }
+
+                const result = await bookResponse.json();
+                alert(result.message);
+
+                const updatedConcertData = {
+                    artist: concert.artist,
+                    venue: concert.venue,
+                    city: concert.city,
+                    startDate: concertDates,
+                    time: concert.time,
+                    originalPrice: concert.originalPrice,
+                    price: concert.price,
+                    discount: concert.discount,
+                    image: concert.image,
+                    isSpecialDeal: concert.isSpecialDeal,
+                };
+
+                const createResponse = await fetch('http://localhost:5000/api/concerts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0LXVzZXItcmF0aW5nIiwiaWF0IjoxNzI4MjM0NTY3fQ.1a2b3c4d5e6f7g8h9i0j',
+                    },
+                    body: JSON.stringify(updatedConcertData),
+                });
+
+                if (!createResponse.ok) {
+                    const error = await createResponse.json();
+                    throw new Error(error.message);
+                }
+
+                const newConcert = await createResponse.json();
+                window.location.href = `booking-details.html?concertId=${newConcert._id}&concertDates=${concertDates}`;
+            } catch (error) {
+                console.error('Error booking concert:', error);
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchConcertDeals);
+    </script>
+</body>
+</html>

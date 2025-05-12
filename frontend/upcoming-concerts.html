@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Upcoming Concerts</title>
+    <link rel="stylesheet" href="css/upcoming.css">
+    <link rel="stylesheet" href="css/concerts.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                
+                <li><a href="concerts.html">Concerts</a></li>
+               
+                <li><a href="contact.html">Contact Us</a></li>
+                
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Upcoming Concerts</h2>
+            <p>Discover the hottest upcoming concerts and get ready for unforgettable performances!</p>
+        </div>
+    </section>
+
+    <!-- Concert Search Form -->
+    <section class="container">
+        <h2>Search Upcoming Concerts</h2>
+        <div class="search-container concert-search">
+            <form id="concert-search-form" onsubmit="searchConcerts(event)">
+                <div class="form-group">
+                    <label for="artist-name">Artist Name:</label>
+                    <input type="text" id="artist-name" name="artistName" placeholder="e.g., Coldplay" required>
+                </div>
+                <div class="form-group">
+                    <label for="city">City:</label>
+                    <input type="text" id="city" name="city" placeholder="e.g., Mumbai" required>
+                </div>
+                <button type="submit">Search Concerts</button>
+            </form>
+        </div>
+
+        <!-- Featured Concert -->
+        <div class="featured-concert">
+            <div class="featured-image" style="background-image: url('images/concerts/coldplay-mumbai.jpg');">
+                <span class="featured-badge">Featured Concert</span>
+                <span class="discount-badge">20% off</span>
+            </div>
+            <div class="featured-details">
+                <h3>Coldplay: Music of the Spheres</h3>
+                <p><span class="icon">🎤</span> Artist: Coldplay</p>
+                <p><span class="icon">🏟️</span> Venue: DY Patil Stadium, Mumbai</p>
+                <p><span class="icon">📅</span> Date: 25 Oct 2025</p>
+                <p><span class="icon">🕒</span> Time: 7:00 PM</p>
+                <p><span class="icon">🎫</span> Section: Platinum</p>
+                <p class="description">Join Coldplay for an electrifying performance in Mumbai as part of their Music of the Spheres World Tour, featuring stunning visuals and hit songs.</p>
+                <div class="concert-price">
+                    <span class="original-price">₹12000</span>
+                    <span class="discounted-price">₹9600</span>
+                    <span class="price-note">per ticket</span>
+                </div>
+                <a href="concerts.html" class="view-details-btn">View Details</a>
+            </div>
+        </div>
+
+        <!-- Available Concerts -->
+        <h3>Upcoming Concerts</h3>
+        <div id="concert-list" class="concert-grid"></div>
+    </section>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Hardcoded concert data with descriptions
+        const concertsData = [
+            {
+                id: 1,
+                artist: "Ed Sheeran",
+                venue: "DY Patil Stadium, Mumbai",
+                date: "20 May 2025",
+                time: "7:00 PM",
+                section: "Gold",
+                description: "Experience the global superstar Ed Sheeran live in concert at the DY Patil Stadium in Mumbai, performing his greatest hits.",
+                originalPrice: "8000",
+                price: "6400",
+                discount: "20% off",
+                image: "images/concerts/ed-sheeran-mumbai.jpg"
+            },
+            {
+                id: 2,
+                artist: "Arijit Singh",
+                venue: "Jawaharlal Nehru Stadium, Delhi",
+                date: "20 May 2025",
+                time: "7:00 PM",
+                section: "Silver",
+                description: "Enjoy a magical evening with Arijit Singh in Delhi, as he performs his chart-topping Bollywood hits.",
+                originalPrice: "5000",
+                price: "4000",
+                discount: "20% off",
+                image: "images/concerts/arijit-singh-delhi.jpg"
+            },
+            {
+                id: 3,
+                artist: "The Chainsmokers",
+                venue: "Bengaluru Palace Grounds, Bangalore",
+                date: "10 July 2025",
+                time: "8:00 PM",
+                section: "VIP",
+                description: "Dance the night away with The Chainsmokers in Bangalore, featuring their biggest EDM hits and a high-energy show.",
+                originalPrice: "8000",
+                price: "6400",
+                discount: "20% off",
+                image: "images/concerts/chainsmokers-bangalore.jpg"
+            },
+            {
+                id: 4,
+                artist: "Shreya Ghoshal",
+                venue: "Kolkata Maidan, Kolkata",
+                date: "15 June 2025",
+                time: "6:00 PM",
+                section: "Platinum",
+                description: "Listen to the melodious voice of Shreya Ghoshal live in Kolkata, performing her timeless classics.",
+                originalPrice: "6000",
+                price: "4800",
+                discount: "20% off",
+                image: "images/concerts/shreya-ghoshal-kolkata.jpg"
+            },
+            {
+                id: 5,
+                artist: "Imagine Dragons",
+                venue: "HITEX Exhibition Centre, Hyderabad",
+                date: "20 May 2025",
+                time: "7:30 PM",
+                section: "Gold",
+                description: "Rock out with Imagine Dragons in Hyderabad as they bring their explosive energy and hit songs to the stage.",
+                originalPrice: "9000",
+                price: "7200",
+                discount: "20% off",
+                image: "images/concerts/imagine-dragons-hyderabad.jpg"
+            },
+            {
+                id: 6,
+                artist: "Diljit Dosanjh",
+                venue: "Guru Nanak Stadium, Amritsar",
+                date: "25 May 2025",
+                time: "7:00 PM",
+                section: "Silver",
+                description: "Join Diljit Dosanjh for a vibrant Punjabi concert in Amritsar, filled with his popular tracks and lively performance.",
+                originalPrice: "4000",
+                price: "3200",
+                discount: "20% off",
+                image: "images/concerts/diljit-dosanjh-amritsar.jpg"
+            },
+            {
+                id: 7,
+                artist: "Billie Eilish",
+                venue: "Chennai Trade Centre, Chennai",
+                date: "30 May 2025",
+                time: "8:00 PM",
+                section: "VIP",
+                description: "Experience Billie Eilish's hauntingly beautiful music live in Chennai, with her unique style and captivating stage presence.",
+                originalPrice: "11000",
+                price: "8800",
+                discount: "20% off",
+                image: "images/concerts/billie-eilish-chennai.jpg"
+            },
+            {
+                id: 8,
+                artist: "Anuv Jain",
+                venue: "Sardar Patel Stadium, Ahmedabad",
+                date: "5 June 2025",
+                time: "6:30 PM",
+                section: "Gold",
+                description: "Enjoy an intimate evening with Anuv Jain in Ahmedabad, as he performs his soulful indie hits.",
+                originalPrice: "3000",
+                price: "2400",
+                discount: "20% off",
+                image: "images/concerts/anuv-jain-ahmedabad.jpg"
+            },
+            {
+                id: 9,
+                artist: "Dua Lipa",
+                venue: "Jaipur Exhibition Centre, Jaipur",
+                date: "10 Aug 2025",
+                time: "7:30 PM",
+                section: "Platinum",
+                description: "Dance to Dua Lipa's pop anthems in Jaipur, as she delivers a high-energy performance with stunning visuals.",
+                originalPrice: "9500",
+                price: "7600",
+                discount: "20% off",
+                image: "images/concerts/dua-lipa-jaipur.jpg"
+            },
+            {
+                id: 10,
+                artist: "Sunidhi Chauhan",
+                venue: "Gachibowli Stadium, Hyderabad",
+                date: "15 Aug 2025",
+                time: "7:00 PM",
+                section: "Silver",
+                description: "Get ready for a powerhouse performance by Sunidhi Chauhan in Hyderabad, featuring her iconic Bollywood songs.",
+                originalPrice: "4500",
+                price: "3600",
+                discount: "20% off",
+                image: "images/concerts/sunidhi-chauhan-hyderabad.jpg"
+            }
+        ];
+
+        function fetchConcerts(filteredConcerts = concertsData) {
+            const concertList = document.getElementById('concert-list');
+            concertList.innerHTML = '';
+            filteredConcerts.forEach(concert => {
+                concertList.innerHTML += `
+                    <div class="concert-card">
+                        <div class="concert-image" style="background-image: url('${concert.image}');">
+                            <span class="discount-badge">${concert.discount}</span>
+                        </div>
+                        <div class="concert-details">
+                            <h4>${concert.artist}</h4>
+                            <div class="concert-info">
+                                <p><span class="icon">🎤</span> Artist: ${concert.artist}</p>
+                                <p><span class="icon">🏟️</span> Venue: ${concert.venue}</p>
+                                <p><span class="icon">📅</span> Date: ${concert.date}</p>
+                                <p><span class="icon">🕒</span> Time: ${concert.time}</p>
+                                <p><span class="icon">🎫</span> Section: ${concert.section}</p>
+                                <p class="description">${concert.description}</p>
+                            </div>
+                            <div class="concert-price">
+                                <span class="original-price">₹${concert.originalPrice}</span>
+                                <span class="discounted-price">₹${concert.price}</span>
+                                <span class="price-note">per ticket</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function searchConcerts(event) {
+            event.preventDefault();
+            const form = document.getElementById('concert-search-form');
+            const formData = new FormData(form);
+            const artistName = formData.get('artistName').toLowerCase();
+            const city = formData.get('city').toLowerCase();
+
+            const filteredConcerts = concertsData.filter(concert =>
+                concert.artist.toLowerCase().includes(artistName) &&
+                concert.venue.toLowerCase().includes(city)
+            );
+
+            if (filteredConcerts.length === 0) {
+                document.getElementById('concert-list').innerHTML = '<p>No concerts found matching your search.</p>';
+                return;
+            }
+
+            fetchConcerts(filteredConcerts);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => fetchConcerts());
+    </script>
+</body>
+</html> 

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Hotels</title>
+    <link rel="stylesheet" href="css/hotels.css">
+    
+    
+    <link rel="stylesheet" href="css/hotel_deals.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <!-- <li><a href="flights.html">Flights</a></li> -->
+                <!-- <li><a href="flight_deals.html">Flight Deals</a></li> -->
+                <li><a href="hotels.html">Hotels</a></li>
+                <li><a href="upcoming-hotels.html">Upcoming Hotels</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Book Your Hotel Today!</h2>
+            <p>Discover the best stays with unbeatable prices!</p>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2>Search Hotels</h2>
+        <div class="search-container hotel-search">
+            <form id="hotel-search-form" onsubmit="searchHotels(event)">
+                <div class="form-group">
+                    <label for="city">City:</label>
+                    <input type="text" id="city" name="city" placeholder="e.g., Mumbai" required>
+                </div>
+                <div class="form-group">
+                    <label for="check-in-date">Check-in Date:</label>
+                    <input type="date" id="check-in-date" name="checkInDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="check-out-date">Check-out Date:</label>
+                    <input type="date" id="check-out-date" name="checkOutDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="guests">Guests:</label>
+                    <input type="number" id="guests" name="guests" min="1" value="1" required>
+                </div>
+                <button type="submit">Search Hotels</button>
+            </form>
+        </div>
+
+        <h3>Available Hotels</h3>
+        <div id="hotel-list" class="hotel-grid"></div>
+    </section>
+
+    <script src="js/auth.js"></script>
+    <script>
+        let allHotels = [];
+
+        async function fetchHotels() {
+            const hotelList = document.getElementById('hotel-list');
+            hotelList.innerHTML = '<p>Loading hotels...</p>';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/hotels');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const raw = await response.text();
+                console.log('API Response:', raw);
+                allHotels = raw ? JSON.parse(raw) : [];
+                console.log('All Hotels:', allHotels);
+
+                if (!allHotels || allHotels.length === 0) {
+                    hotelList.innerHTML = '<p>No hotels available.</p>';
+                    return;
+                }
+
+                displayHotels(allHotels);
+            } catch (error) {
+                console.error('Error fetching hotels:', error);
+                hotelList.innerHTML = `<p>Error loading hotels: ${error.message}. Please try again later.</p>`;
+            }
+        }
+
+        function displayHotels(hotels) {
+            const hotelList = document.getElementById('hotel-list');
+            hotelList.innerHTML = '';
+            hotels.forEach(hotel => {
+                hotelList.innerHTML += `
+                    <div class="hotel-card">
+                        <img class="hotel-img" src="${hotel.image_path || '/images/hotels/default.jpg'}" alt="${hotel.name || 'Hotel Image'}" />
+                        <div class="hotel-details">
+                            <h4>${hotel.name || 'N/A'}, ${hotel.location || 'N/A'}</h4>
+                            <div class="hotel-info">
+                                <p><span class="icon">🏨</span> Rating: ${hotel.rating || '4.5'} stars</p>
+                                <p><span class="icon">🛏️</span> Room Type: ${hotel.room_type || 'N/A'}</p>
+                                <p><span class="icon">💺</span> Rooms Available: ${hotel.rooms_available || 'N/A'}</p>
+                                <p><span class="icon">🗺️</span> <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel.name + ' ' + hotel.location)}" target="_blank">View on Map</a></p>
+                            </div>
+                            <div class="hotel-price">
+                                <span class="discounted-price">₹${hotel.price_per_night || 'N/A'}</span>
+                                <span class="price-note">per night</span>
+                            </div>
+                            <button onclick="bookHotel(${hotel.id || 0})">Book Now</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function searchHotels(event) {
+            event.preventDefault();
+            const form = document.getElementById('hotel-search-form');
+            const formData = new FormData(form);
+            const city = formData.get('city').toLowerCase().trim();
+
+            if (!city) {
+                alert("Please fill out the city field.");
+                return;
+            }
+
+            console.log('Searching for:', { city });
+
+            const filteredHotels = allHotels.filter(hotel =>
+                (hotel.location?.toLowerCase().includes(city) || '')
+            );
+
+            if (filteredHotels.length === 0) {
+                document.getElementById('hotel-list').innerHTML = '<p>No hotels found matching your search.</p>';
+            } else {
+                displayHotels(filteredHotels);
+            }
+        }
+
+        function bookHotel(hotelId) {
+            console.log('bookHotel called with hotelId:', hotelId);
+            try {
+                if (typeof requireAuth !== 'function') {
+                    console.error('requireAuth is not defined. Proceeding without authentication for testing.');
+                    // Uncomment the next line to enforce authentication
+                    // return;
+                } else if (!requireAuth()) {
+                    alert("Please log in to book a hotel.");
+                    return;
+                }
+
+                const form = document.getElementById('hotel-search-form');
+                if (!form) {
+                    console.error('Form not found!');
+                    alert("Error: Form not found. Please reload the page.");
+                    return;
+                }
+
+                const formData = new FormData(form);
+                const checkInDate = formData.get('checkInDate');
+                const checkOutDate = formData.get('checkOutDate');
+                const guests = formData.get('guests');
+
+                if (!checkInDate || !checkOutDate || !guests) {
+                    alert("Please fill in the check-in date, check-out date, and number of guests before booking!");
+                    return;
+                }
+
+                const redirectUrl = `booking-details.html?type=hotel&id=${hotelId}&checkInDate=${encodeURIComponent(checkInDate)}&checkOutDate=${encodeURIComponent(checkOutDate)}&guests=${guests}`;
+                console.log('Redirecting to:', redirectUrl);
+                window.location.href = redirectUrl;
+            } catch (error) {
+                console.error('Error in bookHotel:', error);
+                alert(`An error occurred: ${error.message}`);
+            }
+        }
+
+        function bookFeaturedHotel() {
+            console.log('bookFeaturedHotel called');
+            try {
+                if (typeof requireAuth !== 'function') {
+                    console.error('requireAuth is not defined. Proceeding without authentication for testing.');
+                    // Uncomment the next line to enforce authentication
+                    // return;
+                } else if (!requireAuth()) {
+                    alert("Please log in to book a hotel.");
+                    return;
+                }
+
+                const form = document.getElementById('hotel-search-form');
+                if (!form) {
+                    console.error('Form not found!');
+                    alert("Error: Form not found. Please reload the page.");
+                    return;
+                }
+
+                const formData = new FormData(form);
+                const checkInDate = formData.get('checkInDate');
+                const checkOutDate = formData.get('checkOutDate');
+                const guests = formData.get('guests');
+
+                if (!checkInDate || !checkOutDate || !guests) {
+                    alert("Please fill in the check-in date, check-out date, and number of guests before booking!");
+                    return;
+                }
+
+                const redirectUrl = `booking-details.html?type=hotel&id=0&checkInDate=${encodeURIComponent(checkInDate)}&checkOutDate=${encodeURIComponent(checkOutDate)}&guests=${guests}&isFeatured=true`;
+                console.log('Redirecting to:', redirectUrl);
+                window.location.href = redirectUrl;
+            } catch (error) {
+                console.error('Error in bookFeaturedHotel:', error);
+                alert(`An error occurred: ${error.message}`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => fetchHotels());
+    </script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Concerts</title>
+    <link rel="stylesheet" href="css/concerts.css">
+    <link rel="stylesheet" href="css/concert_deals.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="concerts.html">Concerts</a></li>
+                <li><a href="upcoming-concerts.html">Upcoming Concerts</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>   
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Book Your Concert Tickets Today!</h2>
+            <p>Experience live music and events!</p>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2>Search Concerts</h2>
+        <div class="search-container concert-search">
+            <form id="concert-search-form" onsubmit="searchConcerts(event)">
+                <div class="form-group">
+                    <label for="location">Location:</label>
+                    <input type="text" id="location" name="location" placeholder="e.g., Delhi" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-date">Event Date:</label>
+                    <input type="date" id="event-date" name="eventDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="tickets">Tickets:</label>
+                    <input type="number" id="tickets" name="tickets" min="1" value="1" required>
+                </div>
+                <button type="submit">Search Concerts</button>
+            </form>
+        </div>
+
+        <h3>Available Concerts</h3>
+        <div id="concert-list" class="concert-grid"></div>
+    </section>
+
+    <script>
+        let allConcerts = [];
+
+        async function fetchConcerts() {
+            const concertList = document.getElementById('concert-list');
+            concertList.innerHTML = '<p>Loading concerts...</p>';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/concerts');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const raw = await response.text();
+                allConcerts = raw ? JSON.parse(raw) : [];
+
+                if (!allConcerts || allConcerts.length === 0) {
+                    concertList.innerHTML = '<p>No concerts available.</p>';
+                    return;
+                }
+
+                displayConcerts(allConcerts);
+            } catch (error) {
+                console.error('Error fetching concerts:', error);
+                concertList.innerHTML = `<p>Error loading concerts: ${error.message}. Please try again later.</p>`;
+            }
+        }
+
+        function displayConcerts(concerts) {
+            const concertList = document.getElementById('concert-list');
+            concertList.innerHTML = '';
+            concerts.forEach(concert => {
+                const location = concert.location || 'N/A';
+                const date = concert.date || 'Date not provided';
+                const time = concert.time || 'Time not provided';
+
+                concertList.innerHTML += `
+                    <div class="concert-card">
+                        <img class="concert-img" src="${concert.image_path || '/images/concerts/default.jpg'}" alt="${concert.name || 'Concert Image'}" />
+                        <div class="concert-details">
+                            <h4>${concert.name || 'N/A'} (${concert.artist || 'N/A'})</h4>
+                            <div class="concert-info">
+                                <p><span class="icon">🎤</span> Artist: ${concert.artist || 'N/A'}</p>
+                                <p><span class="icon">📍</span> Location: ${concert.location || 'N/A'}</p>
+                                <p><span class="icon">🌐</span> Map: 
+                                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(concert.location || '')}" target="_blank">
+                                        View on Map
+                                    </a>
+                                </p>
+                                <p><span class="icon">📅</span> Date: ${concert.date || 'N/A'}</p>
+                                <p><span class="icon">⏰</span> Time: ${concert.time || 'N/A'}</p>
+                                <p><span class="icon">💺</span> Seats Available: ${concert.seats_available || 'N/A'}</p>
+                            </div>
+                            <div class="concert-price">
+                                <span class="discounted-price">₹${concert.price || 'N/A'}</span>
+                                <span class="price-note">per ticket</span>
+                            </div>
+                            <button onclick="bookConcert(${concert.id || 0})">Book Now</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function searchConcerts(event) {
+            event.preventDefault();
+            const form = document.getElementById('concert-search-form');
+            const formData = new FormData(form);
+            const location = formData.get('location').toLowerCase().trim();
+
+            if (!location) {
+                alert("Please fill out the location.");
+                return;
+            }
+
+            const filteredConcerts = allConcerts.filter(concert =>
+                concert.location?.toLowerCase().includes(location) || ''
+            );
+
+            if (filteredConcerts.length === 0) {
+                document.getElementById('concert-list').innerHTML = '<p>No concerts found matching your search.</p>';
+            } else {
+                displayConcerts(filteredConcerts);
+            }
+        }
+
+        function bookConcert(concertId) {
+            console.log('bookConcert called with concertId:', concertId); // Debug log
+            try {
+                const form = document.getElementById('concert-search-form');
+                if (!form) {
+                    console.error('Form not found!');
+                    alert("Error: Form not found. Please reload the page.");
+                    return;
+                }
+
+                const formData = new FormData(form);
+                const eventDate = formData.get('eventDate');
+                const tickets = formData.get('tickets');
+
+                if (!eventDate || !tickets) {
+                    alert("Please fill in event date and number of tickets before booking!");
+                    return;
+                }
+
+                const redirectUrl = `booking-details.html?type=concert&id=${concertId}&eventDate=${encodeURIComponent(eventDate)}&tickets=${tickets}`;
+                console.log('Redirecting to:', redirectUrl);
+                window.location.href = redirectUrl;
+            } catch (error) {
+                console.error('Error in bookConcert:', error);
+                alert(`An error occurred: ${error.message}`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => fetchConcerts());
+    </script>
+</body>
+</html>

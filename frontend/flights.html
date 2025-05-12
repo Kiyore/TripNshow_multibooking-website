@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Flights</title>
+    <link rel="stylesheet" href="css/flights.css">
+    
+   
+    
+    <link rel="stylesheet" href="css/flight_deals.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="flights.html">Flights</a></li>
+                <li><a href="upcoming-flights.html">Upcoming Flights</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Book Your Flight Today!</h2>
+            <p>Explore the world with ease – find the best flights at unbeatable prices!</p>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2>Search Flights</h2>
+        <div class="search-container flight-search">
+            <form id="flight-search-form" onsubmit="searchFlights(event)">
+                <div class="form-group">
+                    <label for="departure-city">Departure City:</label>
+                    <input type="text" id="departure-city" name="departureCity" placeholder="e.g., Mumbai" required>
+                </div>
+                <div class="form-group">
+                    <label for="destination-city">Destination City:</label>
+                    <input type="text" id="destination-city" name="destinationCity" placeholder="e.g., Delhi" required>
+                </div>
+                <div class="form-group">
+                    <label for="travel-date">Travel Date:</label>
+                    <input type="date" id="travel-date" name="travelDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="passengers">Passengers:</label>
+                    <input type="number" id="passengers" name="passengers" min="1" value="1" required>
+                </div>
+                <button type="submit">Search Flights</button>
+            </form>
+        </div>
+
+        <h3>Available Flights</h3>
+        <div id="flight-list" class="flight-grid"></div>
+    </section>
+
+    <script src="js/auth.js"></script>
+    <script>
+        let allFlights = [];
+
+        async function fetchFlights() {
+            const flightList = document.getElementById('flight-list');
+            flightList.innerHTML = '<p>Loading flights...</p>';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/flights');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const raw = await response.text();
+                console.log('API Response:', raw);
+                allFlights = raw ? JSON.parse(raw) : [];
+                console.log('All Flights:', allFlights);
+
+                if (!allFlights || allFlights.length === 0) {
+                    flightList.innerHTML = '<p>No flights available.</p>';
+                    return;
+                }
+
+                displayFlights(allFlights);
+            } catch (error) {
+                console.error('Error fetching flights:', error);
+                flightList.innerHTML = `<p>Error loading flights: ${error.message}. Please try again later.</p>`;
+            }
+        }
+
+        function displayFlights(flights) {
+            const flightList = document.getElementById('flight-list');
+            flightList.innerHTML = '';
+            flights.forEach(flight => {
+                flightList.innerHTML += `
+                    <div class="flight-card">
+                        <img class="flight-img" src="${flight.image_path || '/images/flights/default.jpg'}" alt="${flight.name || 'Flight Image'}" />
+
+
+                        <div class="flight-details">
+                            <h4>${flight.source || 'N/A'} to ${flight.destination || 'N/A'}</h4>
+                            <div class="flight-info">
+                                <p><span class="icon">🏢</span> Airline: ${flight.airline_name || 'N/A'}</p>
+                                <p><span class="icon">🛫</span> Departure: ${flight.departure_time || 'N/A'}</p>
+                                <p><span class="icon">🛬</span> Arrival: ${flight.arrival_time || 'N/A'}</p>
+                                <p><span class="icon">💺</span> Seats Available: ${flight.seats_available || 'N/A'}</p>
+                            </div>
+                            <div class="flight-price">
+                                <span class="discounted-price">₹${flight.price || 'N/A'}</span>
+                                <span class="price-note">per person</span>
+                            </div>
+                            <button onclick="bookFlight(${flight.id || 0})">Book Now</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function searchFlights(event) {
+            event.preventDefault();
+            const form = document.getElementById('flight-search-form');
+            const formData = new FormData(form);
+            const departureCity = formData.get('departureCity').toLowerCase().trim();
+            const destinationCity = formData.get('destinationCity').toLowerCase().trim();
+
+            if (!departureCity || !destinationCity) {
+                alert("Please fill out both departure and destination cities.");
+                return;
+            }
+            if (departureCity === destinationCity) {
+                alert("Source and destination cities must be different.");
+                return;
+            }
+
+            console.log('Searching for:', { departureCity, destinationCity });
+
+            const filteredFlights = allFlights.filter(flight =>
+                (flight.source?.toLowerCase().includes(departureCity) || '') &&
+                (flight.destination?.toLowerCase().includes(destinationCity) || '')
+            );
+
+            if (filteredFlights.length === 0) {
+                document.getElementById('flight-list').innerHTML = '<p>No flights found matching your search.</p>';
+            } else {
+                displayFlights(filteredFlights);
+            }
+        }
+
+        function bookFlight(flightId) {
+            console.log('bookFlight called with flightId:', flightId); // Debug log
+            try {
+                if (typeof requireAuth !== 'function') {
+                    console.error('requireAuth is not defined. Proceeding without authentication for testing.');
+                    // Uncomment the next line to enforce authentication
+                    //return;
+                } else if (!requireAuth()) {
+                    alert("Please log in to book a flight.");
+                    return;
+                }
+
+                const form = document.getElementById('flight-search-form');
+                if (!form) {
+                    console.error('Form not found!');
+                    alert("Error: Form not found. Please reload the page.");
+                    return;
+                }
+
+                const formData = new FormData(form);
+                const travelDate = formData.get('travelDate');
+                const passengers = formData.get('passengers');
+
+                if (!travelDate || !passengers) {
+                    alert("Please fill in the travel date and number of passengers before booking!");
+                    return;
+                }
+
+                const redirectUrl = `booking-details.html?type=flight&id=${flightId}&travelDate=${encodeURIComponent(travelDate)}&passengers=${passengers}`;
+                console.log('Redirecting to:', redirectUrl);
+                window.location.href = redirectUrl;
+            } catch (error) {
+                console.error('Error in bookFlight:', error);
+                alert(`An error occurred: ${error.message}`);
+            }
+        }
+
+        function bookFeaturedFlight() {
+            console.log('bookFeaturedFlight called'); // Debug log
+            try {
+                if (typeof requireAuth !== 'function') {
+                    console.error('requireAuth is not defined. Proceeding without authentication for testing.');
+                    // Uncomment the next line to enforce authentication
+                    // return;
+                } else if (!requireAuth()) {
+                    alert("Please log in to book a flight.");
+                    return;
+                }
+
+                const form = document.getElementById('flight-search-form');
+                if (!form) {
+                    console.error('Form not found!');
+                    alert("Error: Form not found. Please reload the page.");
+                    return;
+                }
+
+                const formData = new FormData(form);
+                const travelDate = formData.get('travelDate');
+                const passengers = formData.get('passengers');
+
+                if (!travelDate || !passengers) {
+                    alert("Please fill in the travel date and number of passengers before booking!");
+                    return;
+                }
+
+                const redirectUrl = `booking-details.html?type=flight&id=0&travelDate=${encodeURIComponent(travelDate)}&passengers=${passengers}&isFeatured=true`;
+                console.log('Redirecting to:', redirectUrl);
+                window.location.href = redirectUrl;
+            } catch (error) {
+                console.error('Error in bookFeaturedFlight:', error);
+                alert(`An error occurred: ${error.message}`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => fetchFlights());
+    </script>
+</body>
+</html>

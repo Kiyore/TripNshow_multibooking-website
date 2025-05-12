@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Cabs</title>
+    <link rel="stylesheet" href="css/cabs.css">
+   
+    
+    
+    <!-- <link rel="stylesheet" href="css/cab_deals.css"> -->
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="cabs.html">Cabs</a></li>
+                <li><a href="upcoming-cabs.html">Upcoming Cabs</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Book Your Cab Today!</h2>
+            <p>Enjoy convenient and affordable cab rides!</p>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2>Search Cabs</h2>
+        <div class="search-container cab-search">
+            <form id="cab-search-form" onsubmit="searchCabs(event)">
+                <div class="form-group">
+                    <label for="pickup-city">Pickup City:</label>
+                    <input type="text" id="pickup-city" name="pickupCity" placeholder="e.g., Delhi" required>
+                </div>
+                <div class="form-group">
+                    <label for="drop-city">Drop City:</label>
+                    <input type="text" id="drop-city" name="dropCity" placeholder="e.g., Jaipur" required>
+                </div>
+                <div class="form-group">
+                    <label for="travel-date">Travel Date:</label>
+                    <input type="date" id="travel-date" name="travelDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="seats">Seats:</label>
+                    <input type="number" id="seats" name="seats" min="1" value="1" required>
+                </div>
+                <button type="submit">Search Cabs</button>
+            </form>
+        </div>
+
+        <h3>Available Cabs</h3>
+        <div id="cab-list" class="cab-grid"></div>
+    </section>
+
+    <script src="js/auth.js"></script>
+    <script>
+        let allCabs = [];
+
+        async function fetchCabs() {
+            const cabList = document.getElementById('cab-list');
+            cabList.innerHTML = '<p>Loading cabs...</p>';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/cabs');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const raw = await response.text();
+                console.log('API Response:', raw);
+                allCabs = raw ? JSON.parse(raw) : [];
+                console.log('All Cabs:', allCabs);
+
+                if (!allCabs || allCabs.length === 0) {
+                    cabList.innerHTML = '<p>No cabs available.</p>';
+                    return;
+                }
+
+                displayCabs(allCabs);
+            } catch (error) {
+                console.error('Error fetching cabs:', error);
+                cabList.innerHTML = `<p>Error loading cabs: ${error.message}. Please try again later.</p>`;
+            }
+        }
+
+        function displayCabs(cabs) {
+            const cabList = document.getElementById('cab-list');
+            cabList.innerHTML = '';
+            cabs.forEach(cab => {
+
+                const availability = "Daily";
+                cabList.innerHTML += `
+                    <div class="cab-card">
+                       <img class="cab-img" src="${cab.image_path || '/images/cabs/default.jpg'}" alt="${cab.cab_type || 'Cab Image'}" />
+
+
+                        <div class="cab-details">
+                           <h4>${cab.pickup_location || 'N/A'} to ${cab.drop_location || 'N/A'}</h4>
+
+                            <div class="cab-info">
+                                 <p><span class="icon">🏨</span> Availability: ${availability}</p>
+                                <p><span class="icon">🚗</span> Type: ${cab.cab_type || 'N/A'}</p>
+                                <p><span class="icon">💺</span> Seats: ${cab.seats || 'N/A'}</p>
+                                <p><span class="icon">💺</span> Owner: ${cab.driver_name || 'N/A'}</p>
+                            </div>
+                            <div class="cab-price">
+                                <span class="discounted-price">₹${cab.price || 'N/A'}</span>
+                                <span class="price-note">per trip</span>
+                            </div>
+                            <button onclick="bookCab(${cab.id || 0})">Book Now</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function searchCabs(event) {
+            event.preventDefault();
+            const form = document.getElementById('cab-search-form');
+            const formData = new FormData(form);
+            const pickupCity = formData.get('pickupCity').toLowerCase().trim();
+            const dropCity = formData.get('dropCity').toLowerCase().trim();
+
+            if (!pickupCity || !dropCity) {
+                alert("Please fill out both pickup and drop cities.");
+                return;
+            }
+            if (pickupCity === dropCity) {
+                alert("Pickup and drop cities must be different.");
+                return;
+            }
+
+            console.log('Searching for:', { pickupCity, dropCity });
+
+            const filteredCabs = allCabs.filter(cab =>
+    (cab.pickup_location?.toLowerCase().includes(pickupCity) || '') &&
+    (cab.drop_location?.toLowerCase().includes(dropCity) || '')
+);
+
+            if (filteredCabs.length === 0) {
+                document.getElementById('cab-list').innerHTML = '<p>No cabs found matching your search.</p>';
+            } else {
+                displayCabs(filteredCabs);
+            }
+        }
+
+        function bookCab(cabId) {
+            console.log('bookCab called with cabId:', cabId); // Debug log
+            try {
+                if (typeof requireAuth !== 'function') {
+                    console.error('requireAuth is not defined. Proceeding without authentication for testing.');
+                    // Uncomment the next line to enforce authentication
+                    // return;
+                } else if (!requireAuth()) {
+                    alert("Please log in to book a cab.");
+                    return;
+                }
+
+                const form = document.getElementById('cab-search-form');
+                if (!form) {
+                    console.error('Form not found!');
+                    alert("Error: Form not found. Please reload the page.");
+                    return;
+                }
+
+                const formData = new FormData(form);
+                const travelDate = formData.get('travelDate');
+                const seats = formData.get('seats');
+
+                if (!travelDate || !seats) {
+                    alert("Please fill in travel date and number of seats before booking!");
+                    return;
+                }
+
+                const redirectUrl = `booking-details.html?type=cab&id=${cabId}&travelDate=${encodeURIComponent(travelDate)}&seats=${seats}`;
+                console.log('Redirecting to:', redirectUrl);
+                window.location.href = redirectUrl;
+            } catch (error) {
+                console.error('Error in bookCab:', error);
+                alert(`An error occurred: ${error.message}`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => fetchCabs());
+    </script>
+</body>
+</html>

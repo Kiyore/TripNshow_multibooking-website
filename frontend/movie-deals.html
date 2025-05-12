@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Movie Deals</title>
+    <link rel="stylesheet" href="css/packages.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/deals.css">
+    <link rel="stylesheet" href="css/contact.css">
+    <link rel="stylesheet" href="css/account.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="flights.html">Flights</a></li>
+                <li><a href="buses.html">Buses</a></li>
+                <li><a href="concerts.html">Concerts</a></li>
+                <li><a href="movies.html">Movies</a></li>
+                <li><a href="packages.html">Packages</a></li>
+                <li><a href="hotels.html">Hotels</a></li>
+                <li><a href="cabs.html">Cabs</a></li>
+                <li><a href="sports.html">Sports</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+                <li><a href="account.html">My Account</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Grab the Best Movie Deals Now!</h2>
+            <p>Don’t miss out on our exclusive movie deals!</p>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2>Movie Deals</h2>
+        <div id="movie-deals-list" class="package-grid"></div>
+    </section>
+
+    <script>
+        async function fetchMovieDeals() {
+            const movieDealsList = document.getElementById('movie-deals-list');
+            movieDealsList.innerHTML = '';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/movies/special-deals');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch movie deals');
+                }
+                const movieDeals = await response.json();
+
+                movieDeals.forEach(movie => {
+                    movieDealsList.innerHTML += `
+                        <div class="package-card">
+                            <div class="package-image" style="background-image: url('${movie.image || 'default-image.jpg'}');">
+                                <span class="discount-badge">${movie.discount || '10% off'}</span>
+                                <span class="favorite-icon">❤️</span>
+                            </div>
+                            <div class="package-details">
+                                <h4>${movie.title}</h4>
+                                <div class="package-info">
+                                    <p><span class="icon">🎥</span> Theater: ${movie.theater || 'N/A'}</p>
+                                    <p><span class="icon">📍</span> City: ${movie.city || 'N/A'}</p>
+                                    <p><span class="icon">📅</span> Default Start Date: ${movie.startDate || 'N/A'}</p>
+                                    <p><span class="icon">🕒</span> Time: ${movie.time || 'N/A'}</p>
+                                </div>
+                                <div class="package-price">
+                                    <span class="original-price">₹${movie.originalPrice || '0'}</span>
+                                    <span class="discounted-price">₹${movie.price}</span>
+                                    <span class="price-note">per ticket</span>
+                                </div>
+                                <div class="date-picker">
+                                    <label>Select Movie Date: </label>
+                                    <input type="date" id="movie-dates-${movie._id}" required>
+                                </div>
+                                <button onclick="bookMovie('${movie._id}')">Book Now</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error fetching movie deals:', error);
+                movieDealsList.innerHTML = '<p>Error loading movie deals. Please try again later.</p>';
+            }
+        }
+
+        async function bookMovie(movieId) {
+            const movieDates = document.getElementById(`movie-dates-${movieId}`).value;
+            if (!movieDates) {
+                alert("Please select a movie date before booking!");
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/movies/${movieId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch movie details');
+                }
+                const movie = await response.json();
+
+                const movieData = {
+                    movieId: movieId,
+                    startDate: movieDates,
+                };
+
+                const bookResponse = await fetch('http://localhost:5000/api/movies/book-movie', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0LXVzZXItcmF0aW5nIiwiaWF0IjoxNzI4MjM0NTY3fQ.1a2b3c4d5e6f7g8h9i0j',
+                    },
+                    body: JSON.stringify(movieData),
+                });
+
+                if (!bookResponse.ok) {
+                    const error = await bookResponse.json();
+                    throw new Error(error.message);
+                }
+
+                const result = await bookResponse.json();
+                alert(result.message);
+
+                const updatedMovieData = {
+                    title: movie.title,
+                    theater: movie.theater,
+                    city: movie.city,
+                    startDate: movieDates,
+                    time: movie.time,
+                    originalPrice: movie.originalPrice,
+                    price: movie.price,
+                    discount: movie.discount,
+                    image: movie.image,
+                    isSpecialDeal: movie.isSpecialDeal,
+                };
+
+                const createResponse = await fetch('http://localhost:5000/api/movies', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0LXVzZXItcmF0aW5nIiwiaWF0IjoxNzI4MjM0NTY3fQ.1a2b3c4d5e6f7g8h9i0j',
+                    },
+                    body: JSON.stringify(updatedMovieData),
+                });
+
+                if (!createResponse.ok) {
+                    const error = await createResponse.json();
+                    throw new Error(error.message);
+                }
+
+                const newMovie = await createResponse.json();
+                window.location.href = `booking-details.html?movieId=${newMovie._id}&movieDates=${movieDates}`;
+            } catch (error) {
+                console.error('Error booking movie:', error);
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchMovieDeals);
+    </script>
+</body>
+</html>

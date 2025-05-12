@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripNShow - Upcoming Hotels</title>
+    <link rel="stylesheet" href="css/upcoming.css">
+    <link rel="stylesheet" href="css/hotels.css">
+    
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">TripNShow</a></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                
+                <li><a href="hotels.html">Hotels</a></li>
+                
+                <li><a href="contact.html">Contact Us</a></li>
+                
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Upcoming Hotels</h2>
+            <p>Discover our upcoming hotel properties and plan your next stay!</p>
+        </div>
+    </section>
+
+    <!-- Hotel Search Form -->
+    <section class="container">
+        <h2>Search Upcoming Hotels</h2>
+        <div class="search-container hotel-search">
+            <form id="hotel-search-form" onsubmit="searchHotels(event)">
+                <div class="form-group">
+                    <label for="location">Location:</label>
+                    <input type="text" id="location" name="location" placeholder="e.g., Mumbai" required>
+                </div>
+                <div class="form-group">
+                    <label for="guests">Guests:</label>
+                    <input type="number" id="guests" name="guests" min="1" value="2" required>
+                </div>
+                <button type="submit">Search Hotels</button>
+            </form>
+        </div>
+
+        <!-- Featured Hotel -->
+        <div class="featured-hotel">
+            <div class="featured-image" style="background-image: url('images/hotels/taj-lake-palace.jpg');">
+                <span class="featured-badge">Featured Hotel</span>
+                <span class="discount-badge">20% off</span>
+            </div>
+            <div class="featured-details">
+                <h3>Taj Lake Palace</h3>
+                <p><span class="icon">🏨</span> Hotel: Taj Lake Palace</p>
+                <p><span class="icon">📍</span> Location: Udaipur, Rajasthan</p>
+                <p><span class="icon">📅</span> Opening Date: 15 Jan 2025</p>
+                <p><span class="icon">⭐</span> Rating: 5 Star</p>
+                <p><span class="icon">🛏️</span> Room Type: Lake View Suite</p>
+                <p class="description">Experience luxury at its finest at the upcoming Taj Lake Palace in Udaipur, featuring stunning lake views and world-class amenities.</p>
+                <div class="hotel-price">
+                    <span class="original-price">₹25000</span>
+                    <span class="discounted-price">₹20000</span>
+                </div>
+                <a href="hotels.html" class="view-details-btn">View Details</a>
+            </div>
+        </div>
+
+        <!-- Available Hotels -->
+        <h3>Upcoming Hotels</h3>
+        <div id="hotel-list" class="hotel-grid"></div>
+    </section>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Hardcoded hotel data with descriptions
+        const hotelsData = [
+            {
+                id: 1,
+                name: "Grand Hyatt",
+                location: "Mumbai, Maharashtra",
+                openingDate: "20 May 2025",
+                rating: "5 Star",
+                roomType: "Deluxe Room",
+                description: "Experience luxury at its finest at the upcoming Grand Hyatt Mumbai, featuring world-class amenities and stunning views of the Arabian Sea.",
+                originalPrice: "25000",
+                price: "20000",
+                discount: "20% off",
+                image: "images/hotels/grand-hyatt.jpg"
+            },
+            {
+                id: 2,
+                name: "Hyatt Regency",
+                location: "Delhi, NCR",
+                openingDate: "25 Feb 2025",
+                rating: "5 Star",
+                roomType: "Executive Suite",
+                description: "Experience comfort and elegance at the upcoming Hyatt Regency in Delhi, offering spacious rooms and world-class dining options.",
+                originalPrice: "22000",
+                price: "17600",
+                discount: "20% off",
+                image: "images/hotels/hyatt-regency.jpg"
+            },
+            {
+                id: 3,
+                name: "ITC Grand",
+                location: "Bangalore, Karnataka",
+                openingDate: "5 Mar 2025",
+                rating: "5 Star",
+                roomType: "Luxury Suite",
+                description: "Indulge in luxury at the upcoming ITC Grand in Bangalore, featuring premium amenities and exceptional hospitality in the tech hub of India.",
+                originalPrice: "20000",
+                price: "16000",
+                discount: "20% off",
+                image: "images/hotels/itc-grand.jpg"
+            },
+            {
+                id: 4,
+                name: "Oberoi Udaivilas",
+                location: "Udaipur, Rajasthan",
+                openingDate: "10 Mar 2025",
+                rating: "5 Star",
+                roomType: "Palace View Room",
+                description: "Experience royal luxury at the upcoming Oberoi Udaivilas in Udaipur, offering breathtaking views of the City Palace and Lake Pichola.",
+                originalPrice: "30000",
+                price: "24000",
+                discount: "20% off",
+                image: "images/hotels/oberoi-udaivilas.jpg"
+            },
+            {
+                id: 5,
+                name: "Four Seasons",
+                location: "Mumbai, Maharashtra",
+                openingDate: "15 Mar 2025",
+                rating: "5 Star",
+                roomType: "Ocean View Suite",
+                description: "Stay in style at the upcoming Four Seasons in Mumbai, featuring stunning ocean views and world-class amenities in the financial capital.",
+                originalPrice: "28000",
+                price: "22400",
+                discount: "20% off",
+                image: "images/hotels/four-seasons.jpg"
+            },
+            {
+                id: 6,
+                name: "Leela Palace",
+                location: "Chennai, Tamil Nadu",
+                openingDate: "20 Mar 2025",
+                rating: "5 Star",
+                roomType: "Garden View Room",
+                description: "Experience southern hospitality at the upcoming Leela Palace in Chennai, featuring traditional architecture and modern luxury.",
+                originalPrice: "19000",
+                price: "15200",
+                discount: "20% off",
+                image: "images/hotels/leela-palace.jpg"
+            },
+            {
+                id: 7,
+                name: "JW Marriott",
+                location: "Goa",
+                openingDate: "25 Mar 2025",
+                rating: "5 Star",
+                roomType: "Beach View Suite",
+                description: "Escape to paradise at the upcoming JW Marriott in Goa, offering direct beach access and luxurious amenities for the perfect vacation.",
+                originalPrice: "24000",
+                price: "19200",
+                discount: "20% off",
+                image: "images/hotels/jw-marriott.jpg"
+            },
+            {
+                id: 8,
+                name: "Ritz-Carlton",
+                location: "Pune, Maharashtra",
+                openingDate: "5 Apr 2025",
+                rating: "5 Star",
+                roomType: "City View Room",
+                description: "Experience unparalleled luxury at the upcoming Ritz-Carlton in Pune, featuring elegant rooms and exceptional service in the cultural capital.",
+                originalPrice: "21000",
+                price: "16800",
+                discount: "20% off",
+                image: "images/hotels/ritz-carlton.jpg"
+            },
+            {
+                id: 9,
+                name: "St. Regis",
+                location: "Hyderabad, Telangana",
+                openingDate: "10 Apr 2025",
+                rating: "5 Star",
+                roomType: "Executive Suite",
+                description: "Stay in sophistication at the upcoming St. Regis in Hyderabad, offering luxurious accommodations and world-class dining in the City of Pearls.",
+                originalPrice: "23000",
+                price: "18400",
+                discount: "20% off",
+                image: "images/hotels/st-regis.jpg"
+            },
+            {
+                id: 10,
+                name: "W Hotels",
+                location: "Kolkata, West Bengal",
+                openingDate: "30 Jun 2025",
+                rating: "5 Star",
+                roomType: "Fabulous Room",
+                description: "Experience contemporary luxury at the upcoming W Hotels in Kolkata, featuring vibrant design and exceptional service in the City of Joy.",
+                originalPrice: "20000",
+                price: "16000",
+                discount: "20% off",
+                image: "images/hotels/w-hotels.jpg"
+            }
+        ];
+
+        function fetchHotels(filteredHotels = hotelsData) {
+            const hotelList = document.getElementById('hotel-list');
+            hotelList.innerHTML = '';
+            filteredHotels.forEach(hotel => {
+                hotelList.innerHTML += `
+                    <div class="hotel-card">
+                        <div class="hotel-image" style="background-image: url('${hotel.image}');">
+                            <span class="discount-badge">${hotel.discount}</span>
+                        </div>
+                        <div class="hotel-details">
+                            <h4>${hotel.name}</h4>
+                            <div class="hotel-info">
+                                <p><span class="icon">🏨</span> Hotel: ${hotel.name}</p>
+                                <p><span class="icon">📍</span> Location: ${hotel.location}</p>
+                                <p><span class="icon">📅</span> Opening Date: ${hotel.openingDate}</p>
+                                <p><span class="icon">⭐</span> Rating: ${hotel.rating}</p>
+                                <p><span class="icon">🛏️</span> Room Type: ${hotel.roomType}</p>
+                                <p class="description">${hotel.description}</p>
+                            </div>
+                            <div class="hotel-price">
+                                <span class="original-price">₹${hotel.originalPrice}</span>
+                                <span class="discounted-price">₹${hotel.price}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function searchHotels(event) {
+            event.preventDefault();
+            const form = document.getElementById('hotel-search-form');
+            const formData = new FormData(form);
+            const location = formData.get('location').toLowerCase();
+
+            const filteredHotels = hotelsData.filter(hotel =>
+                hotel.location.toLowerCase().includes(location)
+            );
+
+            if (filteredHotels.length === 0) {
+                document.getElementById('hotel-list').innerHTML = '<p>No hotels found matching your search.</p>';
+                return;
+            }
+
+            fetchHotels(filteredHotels);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => fetchHotels());
+    </script>
+</body>
+</html> 
