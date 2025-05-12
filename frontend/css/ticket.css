@@ -1,0 +1,288 @@
+/* Ticket Styles */
+
+.card-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.ticket {
+    background: #fffaf5; /* Light cream background for a ticket feel */
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    max-width: 600px;
+    margin: 20px auto;
+    border: 2px dashed #ff6f61; /* Coral dashed border for a ticket edge */
+}
+
+.ticket h3 {
+    margin-bottom: 20px;
+    color: #2a9d8f; /* Teal for a fresh travel vibe */
+    font-size: 1.8rem;
+    border-bottom: 2px solid #ffcc66; /* Warm yellow underline */
+    padding-bottom: 10px;
+    text-align: center;
+}
+
+.ticket-details {
+    margin-bottom: 20px;
+}
+
+.ticket-details p {
+    margin: 10px 0;
+    font-size: 1rem;
+    color: #264653; /* Dark teal for text */
+    line-height: 1.6;
+}
+
+.ticket-details p strong {
+    color: #e76f51; /* Salmon for strong text */
+    min-width: 150px;
+    display: inline-block;
+    font-weight: bold;
+}
+
+.traveler-item {
+    margin-left: 20px;
+    padding: 5px 0;
+    background: #f4a261; /* Warm orange for traveler items */
+    color: white; /* White text for contrast */
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.qr-code {
+    text-align: center;
+    margin: 20px 0;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.download-btn {
+    display: block;
+    background: linear-gradient(135deg, #2a9d8f, #264653); /* Teal gradient */
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1rem;
+    margin: 20px auto;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+    width: 80%;
+    max-width: 300px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.download-btn:hover {
+    background: linear-gradient(135deg, #264653, #1e3a3f); /* Darker teal gradient on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.back-link {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    color: #e76f51; /* Salmon for link */
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.back-link:hover {
+    color: #ff5733; /* Brighter red on hover */
+    text-decoration: underline;
+}
+
+/* Additional styles to match the body and container from inline CSS */
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Gradient background */
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Ticket Styles */
+.ticket {
+    background: #fffaf5; /* Light cream background for a ticket feel */
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    max-width: 600px;
+    margin: 20px auto;
+    border: 2px dashed #ff6f61; /* Coral dashed border for a ticket edge */
+}
+
+.ticket h3 {
+    margin-bottom: 20px;
+    color: #2a9d8f; /* Teal for a fresh travel vibe */
+    font-size: 1.8rem;
+    border-bottom: 2px solid #ffcc66; /* Warm yellow underline */
+    padding-bottom: 10px;
+    text-align: center;
+}
+
+.ticket-details {
+    margin-bottom: 20px;
+}
+
+.ticket-details p {
+    margin: 10px 0;
+    font-size: 1rem;
+    color: #264653; /* Dark teal for text */
+    line-height: 1.6;
+}
+
+.ticket-details p strong {
+    color: #e76f51; /* Salmon for strong text */
+    min-width: 150px;
+    display: inline-block;
+    font-weight: bold;
+}
+
+.traveler-item {
+    margin-left: 20px;
+    padding: 5px 0;
+    background: #f4a261; /* Warm orange for traveler items */
+    color: white; /* White text for contrast */
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.qr-code {
+    text-align: center;
+    margin: 20px 0;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.download-btn {
+    display: block;
+    background: linear-gradient(135deg, #2a9d8f, #264653); /* Teal gradient */
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1rem;
+    margin: 20px auto;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+    width: 80%;
+    max-width: 300px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.download-btn:hover {
+    background: linear-gradient(135deg, #264653, #1e3a3f); /* Darker teal gradient on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.back-link {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    color: #e76f51; /* Salmon for link */
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.back-link:hover {
+    color: #ff5733; /* Brighter red on hover */
+    text-decoration: underline;
+}
+
+/* Additional styles to match the body and container from inline CSS */
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Gradient background */
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+header {
+    background: #ff6f61; /* Coral header */
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+    font-size: 24px;
+}
+
+header nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+header nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+header nav ul li a:hover {
+    color: #ffcc66;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+    font-size: 24px;
+}
+
+header nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+header nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+header nav ul li a:hover {
+    color: #ffcc66;
+}

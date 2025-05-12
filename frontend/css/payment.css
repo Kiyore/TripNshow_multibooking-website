@@ -1,0 +1,192 @@
+/* General Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: url('payment1.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #000000;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Header */
+header {
+    background: linear-gradient(135deg, rgba(245, 242, 243, 0.9), rgba(133, 129, 129, 0.95));
+    color: #000000;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 4px solid #ffcc66;
+    width: 100%;
+}
+
+header h1 a {
+    color: #010101;
+    text-decoration: none;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+header h1 a:hover {
+    color: #ffcc66;
+}
+
+/* Payment Container */
+.payment-container {
+    padding: 40px 20px;
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    
+}
+
+/* Payment Card */
+.payment-card {
+    background: rgba(181, 178, 178, 0.95);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.summary-card h2,
+.payment-options h2 {
+    color: #f06910;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ff4800;
+    padding-bottom: 10px;
+}
+
+.payment-card p {
+    margin: 10px 0;
+    font-size: 1rem;
+    color: #444;
+}
+
+.payment-card strong {
+    color: #333;
+}
+
+/* Payment Grid (Replaces Slider) */
+.payment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.payment-option {
+    padding: 15px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #030303; /* Darker text for visibility */
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.payment-option:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.payment-option.selected {
+    border-color: #007421;
+    background-color: #facfab;
+    color: #060606;
+}
+
+/* Pay Button */
+.pay-button {
+    background: linear-gradient(135deg, #ffcc66, #ff9966); /* Matching the orange gradient from the screenshot */
+    color: #333;
+    border: none;
+    padding: 12px 25px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 25px;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.pay-button:hover {
+    background: linear-gradient(135deg, #ff9966, #ff5733);
+    transform: scale(1.05);
+}
+
+.pay-button:disabled {
+    background-color: #e40707;
+    cursor: not-allowed;
+}
+
+/* Payment Animation */
+#payment-animation {
+    display: none;
+    margin-top: 20px;
+    font-size: 18px;
+    color: #28a745;
+}
+
+.success-animation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: #cdf0c6;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.success-animation svg {
+    margin-bottom: 10px;
+}
+
+.success-message {
+    font-size: 20px;
+    margin: 10px 0;
+}
+
+.success-details {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Dotting Animation */
+.dotting {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .payment-container {
+        padding: 20px 10px;
+    }
+    .payment-card {
+        padding: 25px;
+    }
+    .payment-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    }
+    .payment-option {
+        font-size: 0.9rem;
+    }
+    .pay-button {
+        font-size: 14px;
+    }
+}

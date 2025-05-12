@@ -1,0 +1,204 @@
+/* General Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: url('images/payment-bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Header */
+header {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(200, 200, 200, 0.95));
+    color: #333;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 4px solid #ffcc66;
+    width: 100%;
+}
+
+header h1 a {
+    color: #333;
+    text-decoration: none;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+header h1 a:hover {
+    color: #ffcc66;
+}
+
+/* Success Container */
+.success-container {
+    padding: 40px 20px;
+    width: 100%;
+    max-width: 900px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+/* Success Card */
+.success-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.success-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    fill: #28a745;
+}
+
+.success-message {
+    color: #28a745;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.success-details {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.ticket-details {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    text-align: left;
+}
+
+.ticket-details h3,
+.ticket-details h4 {
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+.ticket-details p {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: #444;
+}
+
+.ticket-details strong {
+    color: #333;
+}
+
+/* Action Buttons */
+.action-button {
+    background: linear-gradient(135deg, #ffcc66, #ff9966);
+    color: #333;
+    border: none;
+    padding: 12px 25px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 25px;
+    margin: 10px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.action-button:hover {
+    background: linear-gradient(135deg, #ff9966, #ff5733);
+    transform: scale(1.05);
+}
+
+/* Suggestion Section */
+.suggestion-section {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.suggestion-section h3 {
+    color: #f56403;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.suggestion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+    justify-items: center;
+}
+
+.suggestion-box {
+    text-decoration: none;
+    color: #333;
+    position: relative;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.discount-label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #ff4444;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    z-index: 1;
+}
+
+.suggestion-box img {
+    width: 400px;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 10px 10px 0 0;
+    transition: transform 0.3s ease;
+}
+
+.suggestion-box:hover img {
+    transform: scale(1.05);
+}
+
+.suggestion-box p {
+    font-size: 1rem;
+    margin: 10px 0;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 0 0 10px 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .success-container {
+        padding: 20px 10px;
+    }
+    .success-card {
+        padding: 15px;
+    }
+    .action-button {
+        width: 100%;
+        margin: 5px 0;
+    }
+    .suggestion-grid {
+        grid-template-columns: 1fr;
+    }
+    .suggestion-box img {
+        width: 100%;
+        height: 150px;
+    }
+}
